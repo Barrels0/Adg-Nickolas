@@ -1,20 +1,14 @@
 import sqlite3
-
+from force import force_str,force_float,force_int
 def alteracoes():
     while True:
         try:
-            alteracao = (
-                input(
-                    "\nVocê deseja alterar o preço ou repor estoque (digite 'preço' ou 'estoque'): "
-                )
-                .strip()
-                .lower()
-            )
+            alteracao = force_str("\nVocê deseja alterar o preço ou repor estoque (digite 'preço' ou 'estoque'): ").lower()
 
             if alteracao == "preço" or alteracao == "preco":
                 print("\n----- ALTERAR PREÇO --------")
                 try:
-                    id_venda = int(input("Digite o [ID] do produto: "))
+                    id_venda = force_int("Digite o [ID] do produto: ")
                     
                     with sqlite3.connect("adegas123.db") as conexao:
                         cursor = conexao.cursor()
@@ -30,9 +24,9 @@ def alteracoes():
                     nome_bebida = bebida[0]
                     preco_atual = bebida[1]
 
-                    novo_preco = int(input(
+                    novo_preco = force_int(
                         f"Atualizar o preço da bebida {nome_bebida} (PREÇO ATUAL: R${preco_atual}): "
-                    ))
+                    )
                     
                     preco_atual = novo_preco
 
@@ -56,7 +50,7 @@ def alteracoes():
                 print("\n----- REPOR ESTOQUE --------")
                 
                 try:
-                    id_venda = int(input("Digite o [ID] do produto: "))
+                    id_venda = force_int("Digite o [ID] do produto: ")
                     
                     with sqlite3.connect("adegas123.db") as conexao:
                         cursor = conexao.cursor()
@@ -72,9 +66,9 @@ def alteracoes():
                     nome_bebida = bebida[0]
                     quantidade_atual = bebida[1]
 
-                    quantidade_adicional = int(input(
+                    quantidade_adicional = force_int(
                         f"Quantidade para adicionar ao {nome_bebida.title()} (Atual: {quantidade_atual}): "
-                    ))
+                    )
                     
                     quantidade_atual += quantidade_adicional
 

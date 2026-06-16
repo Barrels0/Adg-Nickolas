@@ -1,4 +1,4 @@
-
+from force import force_str
 import sqlite3
 def teste_qualidade(id_produto):
     print("\n" + "="*20)
@@ -37,7 +37,7 @@ def teste_qualidade(id_produto):
     else:
         print(f"PERIGO: Produto péssimo (Nota 1). A adega não se responsabiliza por defeitos!")
 
-    confirmacao = input("\nDeseja prosseguir com a compra deste item? (S/N): ").strip().upper()
+    confirmacao = force_str("\nDeseja prosseguir com a compra deste item? (S/N): ").upper()
     
     if confirmacao == "S":
         print("-> Qualidade aceita pelo cliente. Prosseguindo...")

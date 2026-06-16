@@ -1,16 +1,16 @@
 import sqlite3
-
+from force import force_str,force_float,force_int
 
 def adicionar_item():
     while True:
         print("\n----- CADASTRAR NOVA BEBIDA --------")
-        novo_nome = input("Digite o nome da bebida: ").strip().lower()
-        novo_tipo = input("Digite o tipo da bebida: ").strip().lower()
-        nova_safra = int(input("Digite a safra da bebida: "))
-        novo_preco = float(input("Digite o preço dessa bebida: ").replace(",", "."))
-        nova_quantidade = int(input("Qual o estoque dessa bebida: "))
-        novo_fornecedor = input("Qual o fornecedor dessa bebida: ").strip().lower()
-        nota = int(input("Qual a nota dessa bebida: "))
+        novo_nome = force_str("Digite o nome da bebida: ").lower()
+        novo_tipo = force_str("Digite o tipo da bebida: ").lower()
+        nova_safra = force_int("Digite a safra da bebida: ")
+        novo_preco = force_float("Digite o preço dessa bebida: ").replace(",", ".")
+        nova_quantidade = force_int("Qual o estoque dessa bebida: ")
+        novo_fornecedor = force_str("Qual o fornecedor dessa bebida: ").lower()
+        nota = force_int("Qual a nota dessa bebida: ")
 
         if nova_quantidade < 0 or novo_preco < 0 or nota < 0 or (nota > 5 and nota < 0):
             print("ERRO: RESPOSTA INVÁLIDA (Valores negativos ou nota fora de 0-5)")
@@ -41,14 +41,13 @@ def adicionar_item():
 def adicionar_fornecedor():
     while True:
         print("\n----- NOVO FORNECEDOR --------")
-        novo_fornecedor = input("Digite o nome do novo fornecedor: ").strip().lower()
-        fornecedor_pais = input("Digite o país do fornecedor: ").strip().lower()
-        fornecedor_cidade = input("Digite a cidade do fornecedor: ").strip().lower()
-        fornecedor_estado = input("Digite o estado do fornecedor: ").strip().lower()
+        novo_fornecedor = force_str("Digite o nome do novo fornecedor: ").lower()
+        fornecedor_pais = force_str("Digite o país do fornecedor: ").lower()
+        fornecedor_cidade = force_str("Digite a cidade do fornecedor: ").lower()
+        fornecedor_estado = force_str("Digite o estado do fornecedor: ").lower()
         try:
-            fornecedor_qualidade = int(
-                input("Digite a qualidade do fornecedor (1-bom, 2-regular, 3-ruim): ")
-            )
+            fornecedor_qualidade = force_int("Digite a qualidade do fornecedor (1-bom, 2-regular, 3-ruim): ")
+            
             if fornecedor_qualidade < 1 or fornecedor_qualidade > 3:
                 print("ERRO: Qualidade deve ser entre 1 e 3!")
                 continue
@@ -94,7 +93,7 @@ def criar_usuario():
     print("\n------- CRIAR CONTA ----- ")
 
     while True:
-        novo_usuario = input("Digite o nome de usuário: ").strip()
+        novo_usuario = force_str("Digite o nome de usuário: ")
 
         with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()
@@ -106,7 +105,7 @@ def criar_usuario():
             continue
         
         # Se chegou aqui, o nome é inédito!
-        senha = input("Crie uma senha: ").strip()
+        senha = force_str("Crie uma senha: ")
 
         with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()
@@ -123,8 +122,8 @@ def criar_usuario():
 def logar_conta():
     while True:
         print("\n--- LOGIN ---")
-        usuario = input("Digite o seu nome: ").strip()
-        senha = input("Digite sua senha: ").strip()
+        usuario = force_str("Digite o seu nome: ")
+        senha = force_str("Digite sua senha: ")
         
         with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()
@@ -138,7 +137,7 @@ def logar_conta():
         else:
             print("Usuário ou senha incorretos!")
             try:
-                opcao = int(input("Você deseja tentar o login de novo (1) ou criar conta (2): "))
+                opcao = force_int("Você deseja tentar o login de novo (1) ou criar conta (2): ")
                 if opcao == 1:
                     continue
                 else:
@@ -160,7 +159,7 @@ def desativar_bebida():
     while True:    
         print("\n=======DESATIVAR BEBIDA DO CATALÓGO (Soft delete)========")
         try:
-            id_produto = int(input("Digite o [ID] da bebida(Ou 0 pra voltar ao menu): "))
+            id_produto = force_int("Digite o [ID] da bebida(Ou 0 pra voltar ao menu): ")
         except ValueError:
             print("ERRO: O ID deve ser um número.")
             return
@@ -179,7 +178,7 @@ def desativar_bebida():
                 return
 
             print("(Digite 0 pra cancelar e voltar ao menu)")
-            confirmar = input(f"Tem certeza que deseja excluir a bebida '{bebida[0]}'? (Historico de vendas sera mantido. (s/n:) )").strip().lower()
+            confirmar = force_str(f"Tem certeza que deseja excluir a bebida '{bebida[0]}'? (Historico de vendas sera mantido. (s/n:) )").lower()
 
             if confirmar == '0':
                 break
@@ -194,11 +193,11 @@ def desativar_bebida():
 import sqlite3
 def corrigir_nome():
     try:
-        id_alvo = int(input("Digite o [ID] que você deseja alterar: "))
+        id_alvo = force_int("Digite o [ID] que você deseja alterar: ")
     except ValueError:
         print("Digite um ID valido")
         return
-    nome_correto = input("Digite o nome correto do sorvete: ").strip()
+    nome_correto = force_str("Digite o nome correto do sorvete: ").lower()
     with sqlite3.connect("adegas.db") as conexao:
         cursor = conexao.cursor()
         cursor.execute("""

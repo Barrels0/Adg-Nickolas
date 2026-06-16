@@ -1,5 +1,5 @@
 import sqlite3
-
+from force import force_int
 
 def exibir_menu_e_estoque(caixa_atual):
     """
@@ -55,7 +55,7 @@ def catalogo_ordenado():
                 4. Maior quantidade
                 5. Menor quantidade
                 """)
-        ordem = input("Digite a maneira que você prefere organizar as bebidas: ")
+        ordem = force_int("Digite a maneira que você prefere organizar as bebidas: ")
 
         # sorted() > cria uma copia da lista que você selecionar, sem considerar o id
         #
@@ -64,17 +64,17 @@ def catalogo_ordenado():
             cursor.execute("SELECT nome,preco,quantidade FROM estoque")
             resultados = cursor.fetchall()
 
-        if ordem == "1":
+        if ordem == 1:
             estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[0].lower())
-        elif ordem == "2":
+        elif ordem == 2:
             estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[1])
-        elif ordem == "3":
+        elif ordem == 3:
             estoque_ordenado = sorted(
                 resultados, key=lambda bebida: bebida[1], reverse=True
             )
-        elif ordem == "4":
+        elif ordem == 4:
             estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[2])
-        elif ordem == "5":
+        elif ordem == 5:
             estoque_ordenado = sorted(
                 resultados, key=lambda bebida: bebida[2], reverse=True
             )

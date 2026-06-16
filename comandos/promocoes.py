@@ -1,5 +1,6 @@
 
 import sqlite3
+from force import force_int,force_float,force_str
 def promocoes():
     while True:    
             print("""---- MENU DE PROMOÇÕES ----
@@ -7,16 +8,16 @@ def promocoes():
                 2- Aplicar promoção para todos os itens
                 3- Aplicar promoção com base no tipo do item              
                         """)
-            escolha_promo = int(input("\nEscolha uma opção: "))
+            escolha_promo = force_int("\nEscolha uma opção: ")
             if escolha_promo == 1:
                     try:
-                         desconto = float(input("Porcentagem de desconto: "))
+                         desconto = force_float("Porcentagem de desconto: ")
                          if 0 < desconto < 100:
                               fator_desconto = (100 - desconto) / 100
                          else:
                               print("Desconto inválido!")
                               return
-                         id_produto = int(input("Digite o [ID] da bebida: "))
+                         id_produto = force_int("Digite o [ID] da bebida: ")
                     except ValueError:
                          print("ERRO: Porcentagem ou ID são invalidos")
                          return
@@ -28,7 +29,7 @@ def promocoes():
                          break
                     
             elif escolha_promo == 2:
-                    desconto = float(input("Porcentagem de desconto: "))
+                    desconto = force_float("Porcentagem de desconto: ")
                     if 0 < desconto < 100:
                         fator_desconto = (100 - desconto) / 100
                     else:
@@ -41,9 +42,9 @@ def promocoes():
                          print("Desconto aplicado com sucesso!")
                          break
             elif escolha_promo == 3:
-                tipo = input("Qual o tipo de bebida que você deseja adicionar um desconto (Ex: Vinho, Whisky): ").strip().lower()
+                tipo = force_str("Qual o tipo de bebida que você deseja adicionar um desconto (Ex: Vinho, Whisky): ").lower()
                 try:
-                    desconto = float(input("Porcentagem de desconto: "))
+                    desconto = force_float("Porcentagem de desconto: ")
                     if 0 < desconto < 100:
                               fator_desconto = (100 - desconto) / 100
                     else:

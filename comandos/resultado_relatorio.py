@@ -1,4 +1,5 @@
 from comandos.interface import exibir_menu_e_estoque
+from force import force_float,force_int
 import sqlite3
 with sqlite3.connect("adegas123.db") as conexao:
         cursor = conexao.cursor()
@@ -79,7 +80,7 @@ def continuar_sistema():
         print("[2] Continuar")
         print("-"*10)
         try:
-            acao_pos_comando = int(input("Escolha uma ação: "))
+            acao_pos_comando = force_int("Escolha uma ação: ")
             if acao_pos_comando == 1:
                 print(f"Encerrando sistema o valor total em caixa é de R${caixa:.2f}")
                 exit()
@@ -107,7 +108,7 @@ def relatorios_expresso():
 def filtros():
     while True:
         print("=====FILTRO POR PREÇO=====")
-        prec_limit = float(input("Digite um valor limite que você deseja gastar: "))                    
+        prec_limit = force_float("Digite um valor limite que você deseja gastar: ")                
         print(f"Bebidas populares abaixo de R${prec_limit}: ")
         with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()

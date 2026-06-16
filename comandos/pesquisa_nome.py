@@ -1,7 +1,8 @@
 import sqlite3
+from force import force_str
 def busca():
     print("\n----- PESQUISAR POR NOME/TIPO/FORNECEDOR -------")
-    termo_busca = input("Digite o nome/tipo/fornecedor da bebida para busca:").strip().lower()
+    termo_busca = force_str("Digite o nome/tipo/fornecedor da bebida para busca:").lower()
     termo_com_curinga = f"%{termo_busca}%" #ele usa o "%" antes e depois pq ai ele pega tudo, por exemplo o nome é vinho e se o usuario digitar vin ele acha do mesmo jeito
     with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()

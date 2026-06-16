@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+from force import force_int,force_str
 from comandos.testequalidade import teste_qualidade
 
 
@@ -10,11 +11,7 @@ def realizar_venda():
 
     while True:
         try:
-            id_venda = int(
-                input(
-                    "Digite o [ID] do produto que você deseja: (-1 para concluir compra -2 para cancelar)"
-                )
-            )
+            id_venda = force_int("Digite o [ID] do produto que você deseja: (-1 para concluir compra -2 para cancelar)")
         except ValueError:
             print("ERRO: ID DEVE SER UM NUMERO INTEIRO")
             continue
@@ -52,7 +49,7 @@ def realizar_venda():
             print("-> Produto rejeitado no teste de qualidade. Escolha outro item.")
             continue
         try:
-            quantidade = int(input(f"Quantos garrafas do {nome_bebida} você deseja: "))
+            quantidade = force_int(f"Quantos garrafas do {nome_bebida} você deseja: ")
         except ValueError:
             print("ERRO: quantidade invalida")
             continue
@@ -86,13 +83,11 @@ def realizar_venda():
         total_compra = sum(item["subtotal"] for item in carrinho)
         print(f"\n =============FECHAMENTO CAIXA==============")
         print(f"Total a pagar: R${total_compra:.2f}")
-        confirmar = (
-            input("Confirmar paramento e registrar venda? (s/n): ").strip().lower()
-        )
+        confirmar = force_str("Confirmar paramento e registrar venda? (s/n): ").lower()
 
         if confirmar == "s":
             pass
-            pagamento = input(
+            pagamento = force_str(
                 "Qual o metodo de pagamento? ( 1-Pix | 2-Cartão de crédito | 3-Cartão de débito): "
             )
             if pagamento == "1":

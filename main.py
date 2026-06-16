@@ -6,7 +6,7 @@ from comandos.alterarpreco_estoque import alteracoes
 from comandos.pesquisa_nome import busca
 from comandos.promocoes import promocoes
 from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros
-
+from force import force_int
 from comandos.registrar_venda import realizar_venda
 
 inicializar_banco()
@@ -22,7 +22,7 @@ with sqlite3.connect("adegas123.db") as conexao:
 print("""Seja bem vindo a adega Nickolas!
           1-Criar conta
           2-Fazer Login""")
-escolha = int(input("Selecione um dos dois itens mostrados acima: "))
+escolha = force_int("Selecione um dos dois itens mostrados acima: ")
 
 # CORREÇÃO: Chamadas limpas sem passar parâmetros (contas)
 if escolha == 1:
@@ -54,7 +54,7 @@ while True:
 
     exibir_menu_e_estoque(caixa)
 
-    comando = int(input("Digite o [ID] do menu que você deseja acessar: "))
+    comando = force_int("Digite o [ID] do menu que você deseja acessar: ")
 
     if comando == 0:
         print(f"Obrigado por visitar nossa loja o caixa total ficou em R${caixa:.2f}")
