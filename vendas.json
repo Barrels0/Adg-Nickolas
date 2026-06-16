@@ -1,0 +1,22 @@
+[
+    {
+        "horarios": "09/06/26 22:02:48",
+        "item": "blue label",
+        "tipo": "whisky",
+        "safra": 1900,
+        "quantidade": 2,
+        "fornecedor": "jonnieh walker",
+        "preco": 600.0,
+        "valor": 1200.0
+    },
+    {
+        "horarios": "10/06/26 10:09:57",
+        "item": "red label",
+        "tipo": "whisky",
+        "safra": 2020,
+        "quantidade": 2,
+        "fornecedor": "jonnie walker",
+        "preco": 50.0,
+        "valor": 100.0
+    }
+]

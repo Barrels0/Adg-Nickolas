@@ -1,0 +1,16 @@
+[{
+        "nome": "PRIMEIRA10",
+        "desconto": 10.0,
+        "quantidade": 1
+    },
+    {
+        "nome": "NICKOLAS15",
+        "desconto": 15,
+        "quantidade": 1
+    },
+    {
+        "nome": "CUPOM",
+        "desconto": 20,
+        "quantidade": 1
+    }
+]

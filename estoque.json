@@ -1,0 +1,29 @@
+[
+    {
+        "nome": "red label",
+        "tipo": "whisky",
+        "safra": 2020,
+        "preco": 50.0,
+        "quantidade": 18,
+        "fornecedor": "jonnie walker",
+        "nota": 5
+    },
+    {
+        "nome": "blue label",
+        "tipo": "whisky",
+        "safra": 1900,
+        "preco": 600.0,
+        "quantidade": 1,
+        "fornecedor": "jonnieh walker",
+        "nota": 5
+    },
+    {
+        "nome": "chanceler",
+        "tipo": "whisky",
+        "safra": 2026,
+        "preco": 20.0,
+        "quantidade": 50,
+        "fornecedor": "sla",
+        "nota": 2
+    }
+]
