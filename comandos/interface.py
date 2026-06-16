@@ -64,23 +64,26 @@ def catalogo_ordenado():
             cursor.execute("SELECT nome,preco,quantidade FROM estoque")
             resultados = cursor.fetchall()
 
+        query_base = "SELECT nome, preco, quantidade FROM livros WHERE ativo = 1"
         if ordem == 1:
-            estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[0].lower())
+            query_base = f"{query_base} ORDER BY LOWER(nome) ASC"
         elif ordem == 2:
-            estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[1])
+            query_base = f"{query_base} ORDER BY preco ASC"
         elif ordem == 3:
-            estoque_ordenado = sorted(
-                resultados, key=lambda bebida: bebida[1], reverse=True
-            )
+            query_base = f"{query_base} ORDER BY preco DESC"
         elif ordem == 4:
-            estoque_ordenado = sorted(resultados, key=lambda bebida: bebida[2])
+            query_base = f"{query_base} ORDER BY quantidade DESC"
         elif ordem == 5:
-            estoque_ordenado = sorted(
-                resultados, key=lambda bebida: bebida[2], reverse=True
-            )
+            query_base = f"{query_base} ORDER BY quantidade ASC"
         else:
             print("Opção inválida")
             return exibir_menu_e_estoque
+
+        with sqlite3.connect("livraria.db") as conexao:
+            cursor = conexao.cursor()
+
+            cursor.execute(query_base)
+            estoque_ordenado = cursor.fetchall()
 
         for bebida in estoque_ordenado:
             nome, preco, quantidade = bebida

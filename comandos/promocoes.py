@@ -1,4 +1,3 @@
-
 import sqlite3
 from force import force_int,force_float,force_str,bsc_id
 def promocoes():
