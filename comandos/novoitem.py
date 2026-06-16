@@ -1,5 +1,5 @@
 import sqlite3
-from force import force_str,force_float,force_int
+from force import force_str,force_float,force_int,bsc_id
 
 def adicionar_item():
     while True:
@@ -158,51 +158,58 @@ def logar_conta():
 def desativar_bebida():
     while True:    
         print("\n=======DESATIVAR BEBIDA DO CATALÓGO (Soft delete)========")
-        try:
-            id_produto = force_int("Digite o [ID] da bebida(Ou 0 pra voltar ao menu): ")
-        except ValueError:
-            print("ERRO: O ID deve ser um número.")
-            return
+        id_produto = bsc_id()
         
-        if id_produto == 0:
+        if id_produto == 0 or id_produto is None:
+            print("Retornando ao menu anterior! ")
             break
         
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        try:
+            with sqlite3.connect("adegas123.db") as conexao:
+                cursor = conexao.cursor()
 
-            cursor.execute("SELECT nome FROM estoque WHERE id = ? AND ativo = 1", (id_produto,))
-            bebida = cursor.fetchone()
+                cursor.execute("SELECT nome FROM estoque WHERE id = ? AND ativo = 1", (id_produto,))
+                bebida = cursor.fetchone()
 
-            if not bebida:
-                print("ERRO: Bebida não encontrada ou já foi desativado.")
-                return
+                if not bebida:
+                    print("ERRO: Bebida não encontrada ou já foi desativado.")
+                    continue
 
-            print("(Digite 0 pra cancelar e voltar ao menu)")
-            confirmar = force_str(f"Tem certeza que deseja excluir a bebida '{bebida[0]}'? (Historico de vendas sera mantido. (s/n:) )").lower()
+                print("(Digite 0 pra cancelar e voltar ao menu)")
+                confirmar = force_str(f"Tem certeza que deseja excluir a bebida '{bebida[0]}'? (Historico de vendas sera mantido. (s/n:) )").lower()
 
-            if confirmar == '0':
-                break
+                if confirmar == '0' or confirmar == "n":
+                    print("operação cancelada! ")
+                    break
 
-            if confirmar == 's':
-                cursor.execute("UPDATE estoque SET ativo = 0 WHERE id = ?", (id_produto,))
-                conexao.commit()
-                print("Bebida desativado do catalago com sucesso!!!!!")
-                break
-            else:
-                continue
-import sqlite3
+                if confirmar == 's':
+                    cursor.execute("UPDATE estoque SET ativo = 0 WHERE id = ?", (id_produto,))
+                    conexao.commit()
+                    print("Bebida desativado do catalago com sucesso!!!!!")
+                    break
+                else:
+                    print("Opção inválida. Digite 's' para sim ou 'n' para não.")
+                    continue
+        except sqlite3.Error as e:
+            print(f"Erro no banco de dados: {e}")
+            conexao.rollback()
+            break
+
 def corrigir_nome():
-    try:
-        id_alvo = force_int("Digite o [ID] que você deseja alterar: ")
-    except ValueError:
-        print("Digite um ID valido")
-        return
+    id_alvo = bsc_id()   
     nome_correto = force_str("Digite o nome correto do sorvete: ").lower()
-    with sqlite3.connect("adegas.db") as conexao:
-        cursor = conexao.cursor()
-        cursor.execute("""
-            UPTADE estoque
-            SET nome = ?
-            WHERE id = ?           
-                    """,(nome_correto,id_alvo))
-        conexao.commit()
+    try:
+        with sqlite3.connect("adegas.db") as conexao:
+            cursor = conexao.cursor()
+            cursor.execute("""
+                UPDATE estoque
+                SET nome = ?
+                WHERE id = ?           
+                        """,(nome_correto,id_alvo))
+            if cursor.rowcount > 0:
+                print("Nome alterado com sucesso!")
+            else:
+                print("Nenhum produto encontrado!")
+    except sqlite3.Error as e:
+        print(f"Erro no banco de dados: {e}")
+        conexao.rollback

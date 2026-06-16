@@ -1,6 +1,6 @@
 
 import sqlite3
-from force import force_int,force_float,force_str
+from force import force_int,force_float,force_str,bsc_id
 def promocoes():
     while True:    
             print("""---- MENU DE PROMOÇÕES ----
@@ -10,23 +10,25 @@ def promocoes():
                         """)
             escolha_promo = force_int("\nEscolha uma opção: ")
             if escolha_promo == 1:
-                    try:
                          desconto = force_float("Porcentagem de desconto: ")
                          if 0 < desconto < 100:
                               fator_desconto = (100 - desconto) / 100
                          else:
                               print("Desconto inválido!")
                               return
-                         id_produto = force_int("Digite o [ID] da bebida: ")
-                    except ValueError:
-                         print("ERRO: Porcentagem ou ID são invalidos")
-                         return
-                    with sqlite3.connect("adegas123.db") as conexao:
-                         cursor = conexao.cursor()
-                         cursor.execute("UPDATE estoque SET preco = ROUND(preco * ?, 2) WHERE id = ?", (fator_desconto, id_produto,))
-                         conexao.commit()
-                         print("Desconto aplicado com sucesso!")
-                         break
+                         id_produto = bsc_id
+                         try:   
+                            with sqlite3.connect("adegas123.db") as conexao:
+                                cursor = conexao.cursor()
+                                cursor.execute("UPDATE estoque SET preco = ROUND(preco * ?, 2) WHERE id = ?", (fator_desconto, id_produto,))
+                                if cursor.rowcount > 0:
+                                     print("Desconto aplicado com sucesso!")
+                                else:
+                                     print("Nenhuma produto foi alterado, verifique se o id existe!")
+                         except sqlite3.Error as e:        
+                            print(f"Erro ao acessar o banco de dados: {e}")
+                            conexao.rollback()
+                            break
                     
             elif escolha_promo == 2:
                     desconto = force_float("Porcentagem de desconto: ")

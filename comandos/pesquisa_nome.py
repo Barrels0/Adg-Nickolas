@@ -7,16 +7,16 @@ def busca():
     with sqlite3.connect("adegas123.db") as conexao:
             cursor = conexao.cursor()
             cursor.execute(
-                "SELECT nome,tipo,fornecedor,safra,preco,quantidade,nota FROM estoque WHERE nome LIKE ? OR tipo LIKE ? OR fornecedor LIKE ?", (termo_com_curinga,termo_com_curinga,termo_com_curinga)
+                "SELECT nome,tipo,fornecedor,safra,preco,quantidade,nota FROM estoque WHERE ativo = 1 AND (LOWER(nome) LIKE ? OR LOWER(tipo) LIKE ? OR fornecedor LIKE ?)", (termo_com_curinga,termo_com_curinga,termo_com_curinga)
             )
             resultados = cursor.fetchall()
             if resultados:
                 print("\nESSAS FORAM AS INFORMAÇÕES ENCONTRADAS:")
-            print("-" * 60)
-        
-            for linha in resultados:
-                nome, tipo, fornecedor, safra, preco, quantidade, nota = linha
-                print(f"-> {nome} ({tipo}) | Safra: {safra} | Fornecedor: {fornecedor} | R$ {preco:.2f} | Estoque: {quantidade} | Nota: {nota}")
+                print("-" * 60)
+            
+                for linha in resultados:
+                    nome, tipo, fornecedor, safra, preco, quantidade, nota = linha
+                    print(f"-> {nome} ({tipo}) | Safra: {safra} | Fornecedor: {fornecedor} | R$ {preco:.2f} | Estoque: {quantidade} | Nota: {nota}")
             else:
                 print("Nenhuma bebida encontrada com esse nome/tipo/fornecedor!")
                 

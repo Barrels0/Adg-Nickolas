@@ -65,3 +65,20 @@ def inicializar_banco():
 
 # Chama a função para o código ser executado de fato
 inicializar_banco()
+
+def aplicar_black_friday():
+    try:
+        with sqlite3.connect("jogos.db") as conexao:
+            cursor = conexao.cursor()
+            cursor.execute("""
+                UPDATE jogos
+                SET preco = ROUND(preco * 0.8, 2)
+                WHERE id_console = 3
+            """)
+            if cursor.rowcount > 0: #o rowcount serve para mostrar quantas linhas do bando de dados foram afetas ou seja se pelo menos 1 linha for alterada ele executa
+                print(f"Black Friday aplicada! {cursor.rowcount} jogos de PS5 receberam 20% de desconto.")
+            else:
+                print("Nenhum jogo de PS5 foi encontrado para atualizar")
+                
+    except sqlite3.Error as e:
+        print(f"Erro ao aplicar a Black Friday no banco de dados: {e}")
