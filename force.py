@@ -1,6 +1,3 @@
-#========================================
-#    UTILS functions
-#========================================
 def force_int(message: str) -> int:
      while True:
           try:
