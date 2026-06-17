@@ -1,7 +1,16 @@
-import sqlite3
+import sqlite3,os #navega em outros arquivos
 from force import force_str,force_float,force_int,bsc_id
-
+from dotenv import load_dotenv #carregar oq tem no ENV, procura no projeto o .env puxa as info de lá
 def adicionar_item():
+    load_dotenv()
+    api_key = os.getenv("API_KEY")
+    url = ""
+    search = force_str("Digite o nome do vinho!")
+    params = {
+        "search": search
+        "page": 1
+    }
+    
     while True:
         print("\n----- CADASTRAR NOVA BEBIDA --------")
         novo_nome = force_str("Digite o nome da bebida: ").lower()
