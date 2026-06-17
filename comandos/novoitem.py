@@ -1,50 +1,84 @@
+import http.client
 import sqlite3,os #navega em outros arquivos
 from force import force_str,force_float,force_int,bsc_id
 from dotenv import load_dotenv #carregar oq tem no ENV, procura no projeto o .env puxa as info de lá
-def adicionar_item():
-    load_dotenv()
-    api_key = os.getenv("API_KEY")
-    url = ""
-    search = force_str("Digite o nome do vinho!")
-    params = {
-        "search": search
-        "page": 1
-    }
+from api import buscar_vinho
+def adicionar_item() -> None:
     
     while True:
         print("\n----- CADASTRAR NOVA BEBIDA --------")
-        novo_nome = force_str("Digite o nome da bebida: ").lower()
-        novo_tipo = force_str("Digite o tipo da bebida: ").lower()
-        nova_safra = force_int("Digite a safra da bebida: ")
-        novo_preco = force_float("Digite o preço dessa bebida: ").replace(",", ".")
-        nova_quantidade = force_int("Qual o estoque dessa bebida: ")
-        novo_fornecedor = force_str("Qual o fornecedor dessa bebida: ").lower()
-        nota = force_int("Qual a nota dessa bebida: ")
+        nome_vinho = input("Digite o nome do vinho que vc deseja:")
 
-        if nova_quantidade < 0 or novo_preco < 0 or nota < 0 or (nota > 5 and nota < 0):
-            print("ERRO: RESPOSTA INVÁLIDA (Valores negativos ou nota fora de 0-5)")
-            continue
-        else:
-            with sqlite3.connect("adegas123.db") as conexao:
-                cursor = conexao.cursor()
-                cursor.execute(
-                    """
-                    INSERT INTO estoque(nome,tipo,safra,preco,quantidade,fornecedor,nota)
-                    VALUES (?,?,?,?,?,?,?)
-                """,
-                    (
-                        novo_nome,
-                        novo_tipo,
-                        nova_safra,
-                        novo_preco,
-                        nova_quantidade,
-                        novo_fornecedor,
-                        nota,
-                    )
-                )  # isso pode ser uma def
-                conexao.commit()
-            print(f"Bebida '{novo_nome}' foi salvo com sucesso! ")
-            break
+        print("Buscando informações na API...")
+        vinho_dados = buscar_vinho(nome_vinho)
+
+        if vinho_dados == []:
+            print("Erro para encontrar o vinho")
+            return None
+        
+        
+        for id_vinho,vinho in enumerate(vinho_dados,1):
+            print(f"ID:{id_vinho} | NOME: {vinho['name']}")
+        
+        escolha_vinho = force_int("Coloque o id do vinho que deseja cadastrar no sistema: ")
+        
+        vinho_escolhido_pelo_usuario = vinho_dados[escolha_vinho - 1]
+        
+        name = vinho_escolhido_pelo_usuario.get("name", "Desconhecido")
+        vintage = vinho_escolhido_pelo_usuario.get("vintage", "Desconhecido")
+        type = vinho_escolhido_pelo_usuario.get("type", "Desconhecido")
+        producer = vinho_escolhido_pelo_usuario.get("winery", "Desconhecido")
+        averageRating = vinho_escolhido_pelo_usuario.get("averageRating", "Desconhecido") #atenção
+        novo_preco = force_float("Digite o preço do vinho: ")
+        nova_quantidade = force_int("Quantidade disponivel em estoque: ")
+        with sqlite3.connect("adegas123.db") as conexao:
+            cursor = conexao.cursor()
+            cursor.execute("""
+                SELECT id,nome, pais, cidade, estado, qualidade FROM fornecedores
+                           """)
+            resultado = cursor.fetchall()
+            if resultado:
+                print("Esses são os nossos fornecedores")
+                for linha in resultado:
+                    id, nome, pais, cidade, estado, qualidade = linha
+                    print(f"-> {id} | Nome: {nome} | Pais: {pais} | Cidade: {cidade} | Estado: {estado} | Qualidade: {qualidade}") 
+                fornece = force_int("O fornecedor desse produto é algum desses? (1-Sim | 2-Não)")
+                if fornece == 1:
+                    escolha = force_int("Digite o [ID] do seu fornecedor: ")
+                    cursor.execute("""
+                    SELECT nome 
+                    FROM fornecedores
+                    WHERE id = ?
+                           """,(escolha,))
+                    result = cursor.fetchone()
+                    novo_fornecedor=result[0]
+                elif fornece == 2:
+                    novo_fornecedor = adicionar_fornecedor()
+                else:
+                    print("Digite um valor valido!")
+                    return
+            resultado = cursor.fetchall()
+        with sqlite3.connect("adegas123.db") as conexao:
+            cursor = conexao.cursor()
+            cursor.execute(
+                """
+                INSERT INTO estoque(nome,tipo,winery,safra,preco,quantidade,fornecedor,nota)
+                    VALUES (?,?,?,?,?,?,?,?)
+            """,
+                (
+                    name,
+                    type,
+                    producer,
+                    vintage,
+                    novo_preco,
+                    nova_quantidade,
+                    novo_fornecedor,
+                    averageRating,
+                )
+            )  # isso pode ser uma def
+            conexao.commit()
+        print(f"Bebida '{name}' foi salvo com sucesso! ")
+        break
 
 
 def adicionar_fornecedor():

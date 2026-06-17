@@ -1,4 +1,5 @@
-import sqlite3
+import sqlite3,os
+from dotenv import load_dotenv
 from comandos.banco_dados import inicializar_banco
 from comandos.interface import exibir_menu_e_estoque, catalogo_ordenado
 from comandos.novoitem import adicionar_item, adicionar_fornecedor,criar_usuario,logar_conta,desativar_bebida,corrigir_nome
@@ -10,6 +11,10 @@ from force import force_int
 from comandos.registrar_venda import realizar_venda
 
 inicializar_banco()
+
+print("Iniciando meu sistema de vinhos...")
+
+print("Vinhos encontrados com sucesso!")
 
 # Apenas o histórico de vendas foi mantido aqui se você precisar dele
 with sqlite3.connect("adegas123.db") as conexao:
@@ -24,7 +29,7 @@ print("""Seja bem vindo a adega Nickolas!
           2-Fazer Login""")
 escolha = force_int("Selecione um dos dois itens mostrados acima: ")
 
-# CORREÇÃO: Chamadas limpas sem passar parâmetros (contas)
+
 if escolha == 1:
     criar_usuario()
     logar_conta()

@@ -32,6 +32,7 @@ def inicializar_banco():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             tipo TEXT NOT NULL,
+            winery TEXT NOT NULL,
             fornecedor TEXT NOT NULL,
             safra INTEGER NOT NULL,
             quantidade INTEGER NOT NULL,
@@ -49,15 +50,15 @@ def inicializar_banco():
             
             # Uma lista contendo os dados dos primeiros vinhos para cadastrar
             bebidas_iniciais = [
-            ("Casillero del Diablo", "Tinto", "Concha y Toro", 2016, 15, 250.0, 5),
-            ("Angelica Zapata", "Tinto", "Catena Zapata", 2019, 15, 230.0, 5) 
+            ("Casillero del Diablo", "Tinto", "Concha y Toro","Fornecedor X", 2016, 15, 250.0, 5),
+            ("Angelica Zapata", "Tinto", "Catena Zapata","Fornecedor Y", 2019, 15, 230.0, 5) 
             ]
 
             # executemany roda o INSERT para cada item da lista acima. 
             # As interrogações (?) são substitutos seguros para os dados da lista.
             cursor.executemany("""
-                INSERT INTO estoque (nome, tipo, fornecedor, safra, quantidade, preco, nota)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO estoque (nome, tipo, winery, fornecedor, safra, quantidade, preco, nota)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, bebidas_iniciais)
             
             # Confirma e salva as alterações de inserção permanentemente no banco
