@@ -1,6 +1,6 @@
 from comandos.interface import exibir_menu_e_estoque
 from force import force_float,force_int
-import sqlite3
+import sqlite3, datetime
 with sqlite3.connect("adegas123.db") as conexao:
         cursor = conexao.cursor()
         cursor.execute("SELECT * FROM vendas")
@@ -121,4 +121,33 @@ def filtros():
             print(f"\n->""\n-> ".join(estoque_barato))
             break
 
-    
+def exportar_relatorio_txt():
+     print("\nGerando relatorio de fechamento...")
+     with sqlite3.connect("adegas123.db") as conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            SELECT vendas.horarios, estoque.nome, vendas.quantidade, vendas.valor
+            FROM vendas
+            INNER JOIN estoque on vendas.id_bebida = estoque.id
+            ORDER BY vendas.id ASC
+        """)
+        vendas = cursor.fetchall()
+
+        if not vendas:
+             print("Nenhuma venda registrada")
+             return
+        cursor.execute("SELECT SUM(valor) FROM vendas")
+        faturamento_total = cursor.fetchone()[0]# esse [0] é pq ele so quer a primeira info da tupla
+
+        nome_arquivo = f"fechamento_caixa{datetime.datetime.now().strftime('%y_%m_%d_%Hh%Mm%Ss')}"
+        with open(nome_arquivo, "w", encoding="utf-8") as arquivo:
+             arquivo.write("=================================\n")
+             arquivo.write("        RELATORIO DE VENDAS      \n")
+             arquivo.write("=================================\n")
+
+             for venda in vendas:
+                  linha = f"DATA: {venda[0]} | Bebida: {venda[1]} | Quantidade {venda[2]}"
+                  arquivo.write(linha)
+             arquivo.write(f"==========FATURAMENTO TOTAL DO DIA DE HOJE: R${faturamento_total:.2f}==========")
+        print(f"SUCESSO! Arquivo '{nome_arquivo}' foi criado na sua pasta!")

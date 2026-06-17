@@ -41,6 +41,7 @@ def exibir_menu_e_estoque(caixa_atual):
     print("  [11] Relatorios Expresso       [12] Catalogo Ordenado")
     print("  [13] Filtro por preço")
     print("  [14] Alterar nome              [15] Desativar bebida")
+    print("  [16] Exportar notinha")
     print("  [0] Sair do Sistema")
     print("=" * 60)
 

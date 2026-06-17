@@ -6,7 +6,7 @@ from comandos.novoitem import adicionar_item, adicionar_fornecedor,criar_usuario
 from comandos.alterarpreco_estoque import alteracoes
 from comandos.pesquisa_nome import busca
 from comandos.promocoes import promocoes
-from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros
+from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros, exportar_relatorio_txt
 from force import force_int
 from comandos.registrar_venda import realizar_venda
 
@@ -112,5 +112,8 @@ while True:
         continuar_sistema()
     elif comando == 15:
         desativar_bebida()
+        continuar_sistema()
+    elif comando == 16:
+        exportar_relatorio_txt()
         continuar_sistema()
 
