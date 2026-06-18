@@ -1,5 +1,7 @@
-import http.client
-import sqlite3,os #navega em outros arquivos
+#COLOCAR O TESTE DA QUALIDADE NESSE CODIGO!
+from connectsql import obter_conexao
+import mysql.connector
+import os #navega em outros arquivos
 from force import force_str,force_float,force_int,bsc_id
 from dotenv import load_dotenv #carregar oq tem no ENV, procura no projeto o .env puxa as info de lá
 from api import buscar_vinho
@@ -31,8 +33,9 @@ def adicionar_item() -> None:
         averageRating = vinho_escolhido_pelo_usuario.get("averageRating", "Desconhecido") #atenção
         novo_preco = force_float("Digite o preço do vinho: ")
         nova_quantidade = force_int("Quantidade disponivel em estoque: ")
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
             cursor.execute("""
                 SELECT id,nome, pais, cidade, estado, qualidade FROM fornecedores
                            """)
@@ -48,7 +51,7 @@ def adicionar_item() -> None:
                     cursor.execute("""
                     SELECT nome 
                     FROM fornecedores
-                    WHERE id = ?
+                    WHERE id = %s
                            """,(escolha,))
                     result = cursor.fetchone()
                     novo_fornecedor=result[0]
@@ -58,12 +61,22 @@ def adicionar_item() -> None:
                     print("Digite um valor valido!")
                     return
             resultado = cursor.fetchall()
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        except mysql.connector.Error as e:
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
+        
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
             cursor.execute(
                 """
                 INSERT INTO estoque(nome,tipo,winery,safra,preco,quantidade,fornecedor,nota)
-                    VALUES (?,?,?,?,?,?,?,?)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 (
                     name,
@@ -77,8 +90,16 @@ def adicionar_item() -> None:
                 )
             )  # isso pode ser uma def
             conexao.commit()
-        print(f"Bebida '{name}' foi salvo com sucesso! ")
-        break
+            print(f"Bebida '{name}' foi salvo com sucesso! ")
+            break
+        except mysql.connector.Error as e:
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
 
 
 def adicionar_fornecedor():
@@ -99,12 +120,13 @@ def adicionar_fornecedor():
             continue
 
         # Adiciona o dicionário na lista 'fornecedor' que foi declarada no topo do arquivo
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
             cursor.execute(
                 """
                     INSERT INTO fornecedores(nome,pais,cidade,estado,qualidade)
-                    VALUES (?,?,?,?,?)
+                    VALUES (%s,%s,%s,%s,%s)
                 """,
                 (
                     novo_fornecedor,
@@ -117,6 +139,14 @@ def adicionar_fornecedor():
             conexao.commit()
             print(f"O fornecedor '{novo_fornecedor}' foi salvo com sucesso! ")
             break
+        except mysql.connector.Error as e:
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
 
     """fonecedores.append(
             {
@@ -138,28 +168,47 @@ def criar_usuario():
     while True:
         novo_usuario = force_str("Digite o nome de usuário: ")
 
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
-            cursor.execute("SELECT usuario FROM usuarios WHERE usuario = ?", (novo_usuario,))
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
+            cursor.execute("SELECT usuario FROM usuarios WHERE usuario = %s", (novo_usuario,))
             resultado = cursor.fetchone()
         
-        if resultado is not None:
-            print("Esse nome de usuário já existe, tente novamente!\n")
-            continue
+            if resultado is not None:
+                print("Esse nome de usuário já existe, tente novamente!\n")
+                continue
         
-        # Se chegou aqui, o nome é inédito!
-        senha = force_str("Crie uma senha: ")
+            # Se chegou aqui, o nome é identico!
+            senha = force_str("Crie uma senha: ")
+        except mysql.connector.Error as e:    
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
 
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
             cursor.execute("""
                 INSERT INTO usuarios (senha, usuario)
-                VALUES (?, ?)
+                VALUES (%s, %s)
             """, (senha, novo_usuario))
             conexao.commit() 
             
-        print("Conta criada com sucesso!")
-        break 
+            print("Conta criada com sucesso!")
+            break 
+        except mysql.connector.Error as e:    
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
+
 
 
 def logar_conta():
@@ -168,28 +217,36 @@ def logar_conta():
         usuario = force_str("Digite o seu nome: ")
         senha = force_str("Digite sua senha: ")
         
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
             # Buscamos combinando usuário E senha direto no banco para maior segurança
-            cursor.execute("SELECT usuario, senha FROM usuarios WHERE usuario = ? AND senha = ?", (usuario, senha))
+            cursor.execute("SELECT usuario, senha FROM usuarios WHERE usuario = %s AND senha = %s", (usuario, senha))
             dados = cursor.fetchone()
             
-        if dados is not None:
-            print("Login realizado com sucesso!")
+            if dados is not None:
+                print("Login realizado com sucesso!")
+                break
+            else:
+                print("Usuário ou senha incorretos!")
+                try:
+                    opcao = force_int("Você deseja tentar o login de novo (1) ou criar conta (2): ")
+                    if opcao == 1:
+                        continue
+                    else:
+                        criar_usuario()
+                        continue
+                except ValueError:
+                    print("Opção inválida. Tentando login novamente.")
+                    continue
+        except mysql.connector.Error as e:    
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
             break
-        else:
-            print("Usuário ou senha incorretos!")
-            try:
-                opcao = force_int("Você deseja tentar o login de novo (1) ou criar conta (2): ")
-                if opcao == 1:
-                    continue
-                else:
-                    criar_usuario()
-                    continue
-            except ValueError:
-                print("Opção inválida. Tentando login novamente.")
-                continue
-
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
         """for id_usuario, login in enumerate(usuarioss):
             if usuario in login["usuario"] and senha in login["senha"]:
                 print("Login realizado com sucesso!")
@@ -207,11 +264,10 @@ def desativar_bebida():
             print("Retornando ao menu anterior! ")
             break
         
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
         try:
-            with sqlite3.connect("adegas123.db") as conexao:
-                cursor = conexao.cursor()
-
-                cursor.execute("SELECT nome FROM estoque WHERE id = ? AND ativo = 1", (id_produto,))
+                cursor.execute("SELECT nome FROM estoque WHERE id = %s AND ativo = 1", (id_produto,))
                 bebida = cursor.fetchone()
 
                 if not bebida:
@@ -226,33 +282,43 @@ def desativar_bebida():
                     break
 
                 if confirmar == 's':
-                    cursor.execute("UPDATE estoque SET ativo = 0 WHERE id = ?", (id_produto,))
+                    cursor.execute("UPDATE estoque SET ativo = 0 WHERE id = %s", (id_produto,))
                     conexao.commit()
                     print("Bebida desativado do catalago com sucesso!!!!!")
                     break
                 else:
                     print("Opção inválida. Digite 's' para sim ou 'n' para não.")
                     continue
-        except sqlite3.Error as e:
+        except mysql.connector.Error as e:
             print(f"Erro no banco de dados: {e}")
             conexao.rollback()
             break
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
 
 def corrigir_nome():
     id_alvo = bsc_id()   
     nome_correto = force_str("Digite o nome correto do sorvete: ").lower()
+    
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
     try:
-        with sqlite3.connect("adegas.db") as conexao:
-            cursor = conexao.cursor()
             cursor.execute("""
                 UPDATE estoque
-                SET nome = ?
-                WHERE id = ?           
+                SET nome = %s
+                WHERE id = %s           
                         """,(nome_correto,id_alvo))
             if cursor.rowcount > 0:
                 print("Nome alterado com sucesso!")
             else:
                 print("Nenhum produto encontrado!")
-    except sqlite3.Error as e:
+    except mysql.connector.Error as e:
         print(f"Erro no banco de dados: {e}")
-        conexao.rollback
+        conexao.rollback()
+        return
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()

@@ -1,57 +1,80 @@
 from comandos.interface import exibir_menu_e_estoque
 from force import force_float,force_int
-import sqlite3, datetime
-with sqlite3.connect("adegas123.db") as conexao:
-        cursor = conexao.cursor()
-        cursor.execute("SELECT * FROM vendas")
-        historico_vendas = cursor.fetchall()
+import datetime
+from connectsql import obter_conexao
+import mysql.connector
+
+conexao = obter_conexao()
+cursor = conexao.cursor()
+cursor.execute("SELECT * FROM vendas")
+historico_vendas = cursor.fetchall()
 caixa = sum(venda[8] for venda in historico_vendas)
+
 def nota_fiscal():
     print("\n=====NOTA FISCAL===============")
     
-    with sqlite3.connect("adegas123.db") as conexao:
-         cursor = conexao.cursor()
-         cursor.execute("""
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("""
             SELECT vendas.id, vendas.horarios, vendas.quantidade, vendas.tipo, vendas.fornecedor, vendas.safra, vendas.preco, vendas.valor, vendas.pagamento
             FROM vendas
-            INNER JOIN estoque ON vendas.id_bebida = bebidas.id
-         """)
-         historico = cursor.fetchall()
+            INNER JOIN estoque ON vendas.id_bebida = estoque.id
+        """)
+        historico = cursor.fetchall()
 
-         if len(historico) == 0:
-              print("Nenhuma venda até o momento!")
-         else:
-              for venda in historico:
+        if len(historico) == 0:
+                print("Nenhuma venda até o momento!")
+        else:
+            for venda in historico:
                 print(f"[{venda[0]}] | Data/Hora: {venda[8]} | {venda[1]} x {venda[4]} | Total venda R$: {venda[7]:.2f}")
+    except mysql.connector.Error as e:
+         conexao.rollback()
+         print(f"Ocorreu um erro: {e}")
+         return
+    finally:
+        if 'conexao' in locals() and conexao.is_connected(): 
+         cursor.close()
+         conexao.close()
 
 def painel_produtomaisvendido():
     while True:   
         print("----Painel de Estatisticas e Balanço/Produto Mais Vendido----")
-        with sqlite3.connect("adegas123.db") as conexao:
-             cursor = conexao.cursor()
-             cursor.execute("SELECT COUNT(*) FROM vendas")
-             if cursor.fetchone()[0] == 0:
-                  print("Sem dados disponiveis para o balanço!")
-                  return
-             cursor.execute("SELECT SUM(valor) FROM vendas")
-             faturamento = cursor.fetchone()[0]
-             print(f"Historico de faturamento Bruto: R${faturamento:.2f}")
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:
+            cursor.execute("SELECT COUNT(*) FROM vendas")
+            if cursor.fetchone()[0] == 0:
+                print("Sem dados disponiveis para o balanço!")
+                return
+            cursor.execute("SELECT SUM(valor) FROM vendas")
+            faturamento = cursor.fetchone()[0]
+            print(f"Historico de faturamento Bruto: R${faturamento:.2f}")
 
-             cursor.execute("SELECT AVG(valor) FROM vendas")
-             ticket_medio = cursor.fetchone()[0]
-             print(f"====Ticket Médio por venda: R${ticket_medio:.2f}")
+            cursor.execute("SELECT AVG(valor) FROM vendas")
+            ticket_medio = cursor.fetchone()[0]
+            print(f"====Ticket Médio por venda: R${ticket_medio:.2f}")
 
-             cursor.execute("""
-                SELECT vendas.id, vendas.horarios, vendas.quantidade, vendas.tipo, vendas.fornecedor, vendas.safra, vendas.preco, vendas.valor, vendas.pagamento " \
+            cursor.execute("""
+                SELECT vendas.id, vendas.horarios, vendas.quantidade, vendas.tipo, vendas.fornecedor, vendas.safra, vendas.preco, vendas.valor, vendas.pagamento
                 FROM vendas
-                INNER JOIN estoque ON vendas.id_bebida = bebidas.id
+                INNER JOIN estoque ON vendas.id_bebida = estoque.id
                 GROUP BY estoque.nome
                 ORDER BY SUM(vendas.quantidade) DESC
                 LIMIT 3
-             """)
-             produto_campeao, maior_quantidade = cursor.fetchone()
-             print(f" -> BEBIDA MAIS VENDIDA: {produto_campeao} ({maior_quantidade}) exemplares vendidos!")
-             break
+            """)
+            dados_campeao = cursor.fetchone()
+            print(f" -> BEBIDA MAIS VENDIDA: {dados_campeao[0]} ({dados_campeao[1]}) exemplares vendidos!")
+            break
+        except mysql.connector.Error as e:
+                 conexao.rollback()
+                 print(f"Ocorreu um erro: {e}")
+                 return
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
+             
         
 def ranking_vendas():
     print("\n--- RANKING DE MAIS VENDIDOS ---")
@@ -92,8 +115,9 @@ def relatorios_expresso():
     while True: 
             print("\n=========RELATORIOS EXPRESSOS=========")
             print("Bebidas em ALERTA DE ESTOQUE: (menos que 3 unidades): ")
-            with sqlite3.connect("adegas123.db") as conexao:
-                cursor = conexao.cursor()
+            conexao = obter_conexao()
+            cursor = conexao.cursor()
+            try:
                 cursor.execute("SELECT nome FROM estoque WHERE quantidade < 3")
 
                 estoque_baixo = [linha[0] for linha in cursor.fetchall()]
@@ -104,28 +128,46 @@ def relatorios_expresso():
                 else:
                     print("\n-> ".join(estoque_baixo))
                     break
+            except mysql.connector.Error as e:
+                 conexao.rollback()
+                 print(f"Ocorreu um erro: {e}")
+                 return
+            finally:
+                if 'conexao' in locals() and conexao.is_connected():
+                 cursor.close()
+                 conexao.close()
 
 def filtros():
     while True:
         print("=====FILTRO POR PREÇO=====")
         prec_limit = force_float("Digite um valor limite que você deseja gastar: ")                
         print(f"Bebidas populares abaixo de R${prec_limit}: ")
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
-            cursor.execute("SELECT nome FROM estoque WHERE preco <= ?", (prec_limit,))
-            estoque_barato = [linha[0] for linha in cursor.fetchall()]
-        if len(estoque_barato) == 0:
-            print("Nenhuma bebida encontrada abaixo de 50 reais!")
-            break
-        else:
-            print(f"\n->""\n-> ".join(estoque_barato))
-            break
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        try:    
+                cursor.execute("SELECT nome FROM estoque WHERE preco <= %s", (prec_limit,))
+                estoque_barato = [linha[0] for linha in cursor.fetchall()]
+                if len(estoque_barato) == 0:
+                    print("Nenhuma bebida encontrada abaixo de 50 reais!")
+                    break
+                else:
+                    print(f"\n->""\n-> ".join(estoque_barato))
+                    break
+        except mysql.connector.Error as e:
+                 conexao.rollback()
+                 print(f"Ocorreu um erro: {e}")
+                 return
+        finally:
+            if 'conexao' in locals() and conexao.is_connected():
+                cursor.close()
+                conexao.close()
+             
 
 def exportar_relatorio_txt():
-     print("\nGerando relatorio de fechamento...")
-     with sqlite3.connect("adegas123.db") as conexao:
-        cursor = conexao.cursor()
-
+    print("\nGerando relatorio de fechamento...")
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
         cursor.execute("""
             SELECT vendas.horarios, estoque.nome, vendas.quantidade, vendas.valor
             FROM vendas
@@ -151,3 +193,11 @@ def exportar_relatorio_txt():
                   arquivo.write(linha)
              arquivo.write(f"==========FATURAMENTO TOTAL DO DIA DE HOJE: R${faturamento_total:.2f}==========")
         print(f"SUCESSO! Arquivo '{nome_arquivo}' foi criado na sua pasta!")
+    except mysql.connector.Error as e:
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            return
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()

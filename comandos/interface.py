@@ -1,6 +1,5 @@
-import sqlite3
 from force import force_int
-
+from connectsql import obter_conexao
 def exibir_menu_e_estoque(caixa_atual):
     """
     Função dedicada a imprimir o menu e o estoque
@@ -11,17 +10,17 @@ def exibir_menu_e_estoque(caixa_atual):
                 Caixa Acumulado: R${caixa_atual:.2f}
     ========================================================
     """)
-    with sqlite3.connect("adegas123.db") as conexao:
-        cursor = conexao.cursor()
-        cursor.execute(
-            "SELECT nome,tipo,safra,preco,quantidade,fornecedor,nota,id FROM estoque"
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    cursor.execute(
+        "SELECT nome,tipo,safra,preco,quantidade,fornecedor,nota,id FROM estoque"
+    )
+    resultados = cursor.fetchall()
+    for bebida in resultados:
+        nome, tipo, safra, preco, quantidade, fornecedor, nota, id = bebida
+        print(
+            f"[{id}] {nome} ({safra}) | Tipo: {tipo} | Fornecedor: {fornecedor} | Nota: {nota} | R$ {preco:.2f} | Estoque: {quantidade}"
         )
-        resultados = cursor.fetchall()
-        for bebida in resultados:
-            nome, tipo, safra, preco, quantidade, fornecedor, nota, id = bebida
-            print(
-                f"[{id}] {nome} ({safra}) | Tipo: {tipo} | Fornecedor: {fornecedor} | Nota: {nota} | R$ {preco:.2f} | Estoque: {quantidade}"
-            )
 
     """print("ACERVO DISPONÍVEL")
     for id_adega, adega in enumerate(estoque_atual):
@@ -60,10 +59,10 @@ def catalogo_ordenado():
 
         # sorted() > cria uma copia da lista que você selecionar, sem considerar o id
         #
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
-            cursor.execute("SELECT nome,preco,quantidade FROM estoque")
-            resultados = cursor.fetchall()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        cursor.execute("SELECT nome,preco,quantidade FROM estoque")
+        resultados = cursor.fetchall()
 
         query_base = "SELECT nome, preco, quantidade FROM livros WHERE ativo = 1"
         if ordem == 1:
@@ -77,16 +76,20 @@ def catalogo_ordenado():
         elif ordem == 5:
             query_base = f"{query_base} ORDER BY quantidade ASC"
         else:
+            conexao.close()
+            cursor.close()
             print("Opção inválida")
             return exibir_menu_e_estoque
 
-        with sqlite3.connect("livraria.db") as conexao:
-            cursor = conexao.cursor()
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
 
-            cursor.execute(query_base)
-            estoque_ordenado = cursor.fetchall()
+        cursor.execute(query_base)
+        estoque_ordenado = cursor.fetchall()
 
         for bebida in estoque_ordenado:
             nome, preco, quantidade = bebida
             print(f"- {nome} - R${preco:.2f} (Qtd: {quantidade})")
+        conexao.close()
+        cursor.close()
         break

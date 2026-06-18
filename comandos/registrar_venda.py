@@ -1,5 +1,6 @@
 import datetime
-import sqlite3
+import mysql.connector
+from connectsql import obter_conexao
 from force import force_int,force_str
 from comandos.testequalidade import teste_qualidade
 
@@ -13,7 +14,7 @@ def realizar_venda():
         try:
             id_venda = force_int("Digite o [ID] do produto que você deseja: (-1 para concluir compra -2 para cancelar)")
         except ValueError:
-            print("ERRO: ID DEVE SER UM NUMERO INTEIRO")
+            print("ERRO: ID DEVE SER UM NUMERO INTE IRO")
             continue
         if id_venda == -1:
             break
@@ -22,16 +23,18 @@ def realizar_venda():
             carrinho = []
             return
 
-        with sqlite3.connect("adegas123.db") as conexao:
-            cursor = conexao.cursor()
-            cursor.execute(
-                "SELECT nome, tipo, fornecedor, safra, quantidade, preco, nota FROM estoque WHERE id= ?",
-                (id_venda,),
-            )
-            bebida_encontrada = cursor.fetchone()
+        conexao = obter_conexao()            
+        cursor = conexao.cursor()
+        cursor.execute(
+            "SELECT nome, tipo, fornecedor, safra, quantidade, preco, nota FROM estoque WHERE id= %s",
+            (id_venda,),
+        )
+        bebida_encontrada = cursor.fetchone()
 
         if not bebida_encontrada:
             print("ERRO ID INVÁLIDO. Essa bebida não existe no sistema")
+            conexao.close()
+            cursor.close()
             continue
 
         (
@@ -43,6 +46,9 @@ def realizar_venda():
             preco_bebida,
             nota_bebida,
         ) = bebida_encontrada
+        
+        conexao.close()
+        cursor.close()
 
         venda_autorizada = teste_qualidade(id_venda)
         if not venda_autorizada:
@@ -60,10 +66,12 @@ def realizar_venda():
 
         if quantidade <= 0:
             print("ERRO: Quantidade inválida")
+            continue
         elif quantidade > estoque_disponivel:
             print(
                 f"Estoque insuficiente. Você ja tem {qtd_carrinho} no carrinho, estoque total é de {quantidade_bebida}."
             )
+            continue
         else:
             carrinho.append(
                 {
@@ -99,46 +107,52 @@ def realizar_venda():
             else:
                 print("ERRO:")
                 return
-            with sqlite3.connect("adegas123.db") as conexao:
-                cursor = conexao.cursor()
-                try:
-                    for item in carrinho:
-                        cursor.execute(
-                            """
-                                UPDATE estoque
-                                SET quantidade = quantidade - ?
-                                WHERE id = ?
-                            """,
-                            (item["quantidade"], item["id"]),
-                        )
-                        cursor.execute(
-                            """
-                                INSERT INTO vendas (horarios,id_bebida, tipo, fornecedor, safra, quantidade, preco, valor, pagamento)
-                                VALUES (?,?,?,?,?,?,?,?,?)
-                            """,
-                            (
-                                datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                                item["id"],
-                                item["tipo"],
-                                item["fornecedor"],
-                                item["safra"],
-                                item["quantidade"],
-                                item["preco"],
-                                item["subtotal"],
-                                pagamento,
-                            ),
-                        )
-                        conexao.commit()
-                    print("Venda concluida com sucesso")
-                except sqlite3.Error as erro:
-                    conexao.rollback()
-                    print("\nERRO FATAL NO BANCO DE DADOS: Transação cancelada.")
-                    print(f"Motivo tecnico: {erro}")
-                    print(
-                        "O estoque foi restaurado e nenhuma nota fiscal corrompida foi gerada."
+            conexao = obter_conexao()
+            cursor = conexao.cursor()
+            try:
+                for item in carrinho:
+                    cursor.execute(
+                         """
+                            UPDATE estoque
+                            SET quantidade = quantidade - %s
+                            WHERE id = %s
+                        """,
+                        (item["quantidade"], item["id"]),
                     )
+                    cursor.execute(
+                        """
+                            INSERT INTO vendas (horarios,id_bebida, tipo, fornecedor, safra, quantidade, preco, valor, pagamento)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                            """,
+                        (
+                            datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                            item["id"],
+                            item["tipo"],
+                            item["fornecedor"],
+                            item["safra"],
+                            item["quantidade"],
+                            item["preco"],
+                            item["subtotal"],
+                            pagamento,
+                        ),
+                    )
+                    conexao.commit()
+                    print("Venda concluida com sucesso")
+            except mysql.connector.Error as erro:
+                conexao.rollback()
+                print("\nERRO FATAL NO BANCO DE DADOS: Transação cancelada.")
+                print(f"Motivo tecnico: {erro}")
+                print(
+                    "O estoque foi restaurado e nenhuma nota fiscal corrompida foi gerada."
+                )
+                return
+            finally: # O bloco 'finally' garante que fechará a conexão dando erro ou dando certo
+                if 'conexao' in locals() and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
         else:
             print("Venda não realizada")
+
 
 
 """

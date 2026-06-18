@@ -1,4 +1,5 @@
-import sqlite3
+import mysql.connector
+from connectsql import obter_conexao
 from force import force_str,force_float,force_int
 def alteracoes():
     while True:
@@ -10,41 +11,51 @@ def alteracoes():
                 try:
                     id_venda = force_int("Digite o [ID] do produto: ")
                     
-                    with sqlite3.connect("adegas123.db") as conexao:
-                        cursor = conexao.cursor()
-                        cursor.execute("SELECT nome, preco FROM estoque WHERE id = ?", (id_venda,))
+                    conexao = obter_conexao()
+                    cursor = conexao.cursor()
+                    try:    
+                        cursor.execute("SELECT nome, preco FROM estoque WHERE id = %s", (id_venda,))
                         bebida = cursor.fetchone()
 
-                    # VALIDAÇÃO: Se o banco retornou None, o ID digitado não existe na tabela
-                    if not bebida:
-                        print("ERRO: Bebida não encontrada no banco de dados!")
-                        continue 
+                        if not bebida:
+                            print("ERRO: Bebida não encontrada no banco de dados!")
+                            continue 
 
-                    # separa os valores vindos pelo select usando os seus indices
-                    nome_bebida = bebida[0]
-                    preco_atual = bebida[1]
+                        nome_bebida = bebida[0]
+                        preco_atual = bebida[1]
 
-                    novo_preco = force_int(
-                        f"Atualizar o preço da bebida {nome_bebida} (PREÇO ATUAL: R${preco_atual}): "
-                    )
-                    
-                    preco_atual = novo_preco
+                        novo_preco = force_float(
+                            f"Atualizar o preço da bebida {nome_bebida} (PREÇO ATUAL: R${preco_atual}): "
+                        )
+                        
+                        preco_atual = novo_preco
 
-                    with sqlite3.connect("adegas123.db") as conexao:    
+                        conexao = obter_conexao()   
                         cursor = conexao.cursor()
-                        # CORREÇÃO: Usamos UPDATE para modificar o registro existente, filtrando pelo ID
                         cursor.execute("""
                             UPDATE estoque 
-                            SET preco = ? 
-                            WHERE id = ?
+                            SET preco = %s 
+                            WHERE id = %s
                         """, (preco_atual, id_venda))
-                        
+                            
                         conexao.commit()
                         print(f"\Alteração feita com sucesso! '{nome_bebida}' agora custa R${preco_atual}.")
                         break
 
+                    except mysql.connector.Error as e:
+                        conexao.rollback()
+                        print("\nERRO FATAL NO BANCO DE DADOS: Transação cancelada.")
+                        print(f"Motivo tecnico: {e}")
+                        print(
+                        "O estoque foi restaurado e nenhuma nota fiscal corrompida foi gerada."
+                        )  
+                        break
+                    finally:
+                        if 'conexao' in locals() and conexao.is_connected():
+                            conexao.close()
+                            cursor.close() 
                 except ValueError:
-                    print("ERRO: Digite valores numéricos válidos!")
+                    print("ERRO: Digite um valor válido!")
 
             elif alteracao == "estoque":
                 print("\n----- REPOR ESTOQUE --------")
@@ -52,41 +63,50 @@ def alteracoes():
                 try:
                     id_venda = force_int("Digite o [ID] do produto: ")
                     
-                    with sqlite3.connect("adegas123.db") as conexao:
-                        cursor = conexao.cursor()
-                        cursor.execute("SELECT nome, quantidade FROM estoque WHERE id = ?", (id_venda,))
+                    conexao = obter_conexao()
+                    cursor = conexao.cursor()
+                    try:
+                        cursor.execute("SELECT nome, quantidade FROM estoque WHERE id = %s", (id_venda,))
                         bebida = cursor.fetchone()
 
-                    # VALIDAÇÃO: Se o banco retornou None, o ID digitado não existe na tabela
-                    if not bebida:
-                        print("ERRO: Bebida não encontrada no banco de dados!")
-                        continue 
+                        # VALIDAÇÃO: Se o banco retornou None, o ID digitado não existe na tabela
+                        if not bebida:
+                            print("ERRO: Bebida não encontrada no banco de dados!")
+                            continue 
 
-                    # separa os valores vindos pelo select usando os seus indices
-                    nome_bebida = bebida[0]
-                    quantidade_atual = bebida[1]
+                        # separa os valores vindos pelo select usando os seus indices
+                        nome_bebida = bebida[0]
+                        quantidade_atual = bebida[1]
 
-                    quantidade_adicional = force_int(
-                        f"Quantidade para adicionar ao {nome_bebida.title()} (Atual: {quantidade_atual}): "
-                    )
-                    
-                    quantidade_atual += quantidade_adicional
+                        quantidade_adicional = force_int(
+                            f"Quantidade para adicionar ao {nome_bebida.title()} (Atual: {quantidade_atual}): "
+                        )
+                        
+                        quantidade_atual += quantidade_adicional
 
-                    with sqlite3.connect("adegas123.db") as conexao:    
+                        conexao = obter_conexao()  
                         cursor = conexao.cursor()
-                        # CORREÇÃO: Usamos UPDATE para modificar o registro existente, filtrando pelo ID
                         cursor.execute("""
                             UPDATE estoque 
-                            SET quantidade = ? 
-                            WHERE id = ?
+                            SET quantidade = %s 
+                            WHERE id = %s
                         """, (quantidade_atual, id_venda))
-                        
+                            
                         conexao.commit()
                         print(f"\nReposição feita com sucesso! '{nome_bebida}' agora tem {quantidade_atual} unidades.")
                         break
+                    except mysql.connector.Error as e:
+                        conexao.rollback
+                        print(f"Erro no bando de dados: {e}")
+                        break
+                    finally:
+                        if 'conexao' in locals() and conexao.is_connected():
+                            conexao.close()
+                            cursor.close()
 
                 except ValueError:
                     print("ERRO: Digite valores numéricos válidos!")
+                    continue
         except ValueError:
             print("Digite um valor correspondente ao que foi solicitado!")
             continue

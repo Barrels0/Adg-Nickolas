@@ -1,10 +1,13 @@
-import sqlite3
+#USAR O BSC_ID EM TUDO!!!!!!!!!
+from connectsql import obter_conexao
+import mysql.connector
 def force_int(message: str) -> int:
      while True:
           try:
                return int(input(message))
           except:
                print("Digite um numero inteiro valido")
+               continue
 
 def force_float(message: str) -> float:
      while True:
@@ -12,6 +15,7 @@ def force_float(message: str) -> float:
                return float(input(message))
           except:
                print("Digite um numero valido")
+               continue
 
 def force_str(message: str) -> str:
      while True:
@@ -19,23 +23,32 @@ def force_str(message: str) -> str:
                return str(input(message)).strip()
           except:
                print("Digite uma string valida")
-def bsc_id() -> int:
-     while True:   
-        id_venda = force_int("Digite o [ID] do produto que você deseja: ")
+               continue
 
-        if id_venda in None:
-             return id_venda
+def bsc_id(mensagem="Digite o [ID] do produto: ") -> int:
+    while True:   
         try:
-               with sqlite3.connect("adegas123.db") as conexao:
-                  cursor = conexao.cursor()
-                  cursor.execute("SELECT * FROM estoque WHERE id = ?",
-                                 (id_venda,))
-                  bebida_encontrada = cursor.fetchone()
-               if not bebida_encontrada:
-                  print("ERRO: ID INVÁLIDO. Essa bebida não existe no sistema.")
-                  continue
-               return bebida_encontrada
-        except sqlite3.Error as e:
-             print(f"Erro no banco de dados: {e}")
-             conexao.rollback()
-             return None
+            id_venda = force_int(mensagem)
+        except ValueError:
+            print("ERRO: O ID deve ser um número inteiro!")
+            continue
+
+        conexao = obter_conexao()
+        cursor = conexao.cursor()
+        
+        try:
+            cursor.execute("SELECT id FROM estoque WHERE id = %s AND ativo = 1", (id_venda,))
+            bebida_encontrada = cursor.fetchone()
+            
+            if not bebida_encontrada:
+                print("ERRO: ID INVÁLIDO. Essa bebida não existe no sistema.")
+                continue
+            
+            return id_venda
+            
+        except mysql.connector.Error as e:
+            print(f"Erro no banco de dados: {e}")
+            break 
+        finally:
+            cursor.close()
+            conexao.close()

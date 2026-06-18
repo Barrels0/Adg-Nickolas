@@ -1,21 +1,34 @@
 from force import force_str
-import sqlite3
+from connectsql import obter_conexao
+import mysql.connector
 def teste_qualidade(id_produto):
     print("\n" + "="*20)
     print("---- TESTE DE QUALIDADE (AVALIAÇÃO) ----")
     print("="*20)
     
-    with sqlite3.connect("adegas123.db") as conexao:
-        cursor = conexao.cursor()
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
         cursor.execute(
-            "SELECT nome,fornecedor,nota FROM estoque WHERE id = ?",(id_produto,)
+            "SELECT fornecedor,nota FROM estoque WHERE id = %s",(id_produto,)
             )
         resultados = cursor.fetchall()
         cursor.execute("SELECT * FROM fornecedores")#usa em outras operações!
         fornecedor = cursor.fetchall()
 
-    nota_produto = resultados[0][2]
-    nome_fornecedor = resultados[0][1]
+        if not resultados:
+            return False
+
+        nota_produto = resultados[0][1]
+        nome_fornecedor = resultados[0][0]
+    except mysql.connector.Error as e:
+        conexao.rollback()
+        print(f"Ocorreu um erro: {e}")
+        return
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()
     
     status_fornecedor = "Não cadastrado"
     
