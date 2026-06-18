@@ -1,7 +1,7 @@
 import datetime
 import mysql.connector
-from connectsql import obter_conexao
-from force import force_int,force_str
+from othrs.connectsql import obter_conexao
+from othrs.force import force_int,force_str
 from comandos.testequalidade import teste_qualidade
 
 

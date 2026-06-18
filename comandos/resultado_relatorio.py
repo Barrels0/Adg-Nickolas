@@ -1,7 +1,7 @@
 from comandos.interface import exibir_menu_e_estoque
-from force import force_float,force_int
+from othrs.force import force_float,force_int
 import datetime
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 import mysql.connector
 
 conexao = obter_conexao()

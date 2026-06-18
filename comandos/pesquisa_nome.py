@@ -1,6 +1,6 @@
 import mysql.connector
-from connectsql import obter_conexao
-from force import force_str
+from othrs.connectsql import obter_conexao
+from othrs.force import force_str
 def busca():
     print("\n----- PESQUISAR POR NOME/TIPO/FORNECEDOR -------")
     termo_busca = force_str("Digite o nome/tipo/fornecedor da bebida para busca:").lower()

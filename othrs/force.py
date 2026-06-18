@@ -1,5 +1,5 @@
 #USAR O BSC_ID EM TUDO!!!!!!!!!
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 import mysql.connector
 def force_int(message: str) -> int:
      while True:

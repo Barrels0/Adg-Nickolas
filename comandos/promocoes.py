@@ -1,6 +1,6 @@
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 import mysql.connector
-from force import force_int,force_float,force_str,bsc_id
+from othrs.force import force_int,force_float,force_str,bsc_id
 def promocoes():
     while True:    
             print("""---- MENU DE PROMOÇÕES ----

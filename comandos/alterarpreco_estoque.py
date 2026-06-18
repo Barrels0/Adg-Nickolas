@@ -1,6 +1,6 @@
 import mysql.connector
-from connectsql import obter_conexao
-from force import force_str,force_float,force_int
+from othrs.connectsql import obter_conexao
+from othrs.force import force_str,force_float,force_int
 def alteracoes():
     while True:
         try:

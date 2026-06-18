@@ -1,5 +1,5 @@
 import mysql.connector
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 
 from comandos.banco_dados import inicializar_banco
 from comandos.interface import exibir_menu_e_estoque, catalogo_ordenado
@@ -9,7 +9,7 @@ from comandos.pesquisa_nome import busca
 from comandos.promocoes import promocoes
 from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros, exportar_relatorio_txt
 
-from force import force_int
+from othrs.force import force_int
 from comandos.registrar_venda import realizar_venda
 
 inicializar_banco()

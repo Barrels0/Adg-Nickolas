@@ -1,7 +1,7 @@
 # Importa o módulo nativo do Python para trabalhar com o banco de dados SQLite
 import sqlite3 
 import mysql.connector
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 # Define a função que vai preparar o banco de dados
 def inicializar_banco():
     

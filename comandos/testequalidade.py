@@ -1,5 +1,5 @@
-from force import force_str
-from connectsql import obter_conexao
+from othrs.force import force_str
+from othrs.connectsql import obter_conexao
 import mysql.connector
 def teste_qualidade(id_produto):
     print("\n" + "="*20)

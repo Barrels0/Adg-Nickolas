@@ -1,10 +1,10 @@
 #COLOCAR O TESTE DA QUALIDADE NESSE CODIGO!
-from connectsql import obter_conexao
+from othrs.connectsql import obter_conexao
 import mysql.connector
 import os #navega em outros arquivos
-from force import force_str,force_float,force_int,bsc_id
+from othrs.force import force_str,force_float,force_int,bsc_id
 from dotenv import load_dotenv #carregar oq tem no ENV, procura no projeto o .env puxa as info de lá
-from api import buscar_vinho
+from othrs.api import buscar_vinho
 def adicionar_item() -> None:
     
     while True:

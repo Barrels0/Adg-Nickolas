@@ -1,5 +1,5 @@
-from force import force_int
-from connectsql import obter_conexao
+from othrs.force import force_int
+from othrs.connectsql import obter_conexao
 def exibir_menu_e_estoque(caixa_atual):
     """
     Função dedicada a imprimir o menu e o estoque
