@@ -15,7 +15,7 @@ def inicializar_banco():
         try:
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS estoque (
-                id INTEGER PRIMARY KEY AUTO_INCRIMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 nome VARCHAR(100) NOT NULL,
                 tipo VARCHAR(100) NOT NULL,
                 winery VARCHAR(100) NOT NULL,
@@ -30,7 +30,7 @@ def inicializar_banco():
             
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS vendas (
-                id INTEGER PRIMARY KEY AUTO_INCRIMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 horarios VARCHAR(100) NOT NULL,
                 id_bebida INTEGER NOT NULL,
                 quantidade INTEGER NOT NULL,
@@ -46,7 +46,7 @@ def inicializar_banco():
             
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS usuarios (
-                id INTEGER PRIMARY KEY AUTO_INCRIMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 usuario VARCHAR(100) NOT NULL,
                 senha VARCHAR(100) NOT NULL
             )
@@ -54,21 +54,21 @@ def inicializar_banco():
             
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS fornecedores (
-                id INTEGER PRIMARY KEY AUTO_INCRIMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 nome VARCHAR(100) NOT NULL,
                 pais VARCHAR(100) NOT NULL,
                 cidade VARCHAR(100) NOT NULL,
                 estado VARCHAR(100) NOT NULL,
-                safra INTEGER NOT NULL,
+                safra INTEGER NOT NULL
             )
                 """)
             
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS cupons (
-                id INTEGER PRIMARY KEY AUTO_INCRIMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 nome VARCHAR(100) NOT NULL,
                 desconto INT NOT NULL,
-                quantidade INT NOT NULL,
+                quantidade INT NOT NULL
             )
                 """)
 

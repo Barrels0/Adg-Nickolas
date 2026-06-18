@@ -4,12 +4,6 @@ import datetime
 from othrs.connectsql import obter_conexao
 import mysql.connector
 
-conexao = obter_conexao()
-cursor = conexao.cursor()
-cursor.execute("SELECT * FROM vendas")
-historico_vendas = cursor.fetchall()
-caixa = sum(venda[8] for venda in historico_vendas)
-
 def nota_fiscal():
     print("\n=====NOTA FISCAL===============")
     
@@ -17,7 +11,7 @@ def nota_fiscal():
     cursor = conexao.cursor()
     try:
         cursor.execute("""
-            SELECT vendas.id, vendas.horarios, vendas.quantidade, vendas.tipo, vendas.fornecedor, vendas.safra, vendas.preco, vendas.valor, vendas.pagamento
+            SELECT vendas.id, vendas.horarios, vendas.quantidade, estoque.nome, vendas.preco, vendas.valor
             FROM vendas
             INNER JOIN estoque ON vendas.id_bebida = estoque.id
         """)
@@ -27,7 +21,7 @@ def nota_fiscal():
                 print("Nenhuma venda até o momento!")
         else:
             for venda in historico:
-                print(f"[{venda[0]}] | Data/Hora: {venda[8]} | {venda[1]} x {venda[4]} | Total venda R$: {venda[7]:.2f}")
+                print(f"[{venda[0]}] | Data/Hora: {venda[1]} | {venda[2]}x {venda[3]} (R$ {venda[4]:.2f}) | Total: R$ {venda[5]:.2f}")
     except mysql.connector.Error as e:
          conexao.rollback()
          print(f"Ocorreu um erro: {e}")
@@ -78,36 +72,43 @@ def painel_produtomaisvendido():
         
 def ranking_vendas():
     print("\n--- RANKING DE MAIS VENDIDOS ---")
-    if len(historico_vendas) == 0:
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
+        # O MySQL processa o agrupamento e ordenação diretamente, eliminando loops manuais complexos
+        cursor.execute("""
+            SELECT estoque.nome, CAST(SUM(vendas.quantidade) AS SIGNED) as total
+            FROM vendas
+            INNER JOIN estoque ON vendas.id_bebida = estoque.id
+            GROUP BY estoque.id, estoque.nome
+            ORDER BY total DESC
+        """)
+        ranking = cursor.fetchall()
+
+        if not ranking:
             print("Sem dados de vendas para gerar o ranking!")
-    else:
-            contagem_vendas = {}
-            # Preenche o dicionário somando as quantidades vendidas de cada item
-            for venda in historico_vendas:
-                produto_nome = venda[2]
-                qtd = venda[6]
-                if produto_nome in contagem_vendas:
-                    contagem_vendas[produto_nome] += qtd
-                else:
-                    contagem_vendas[produto_nome] = qtd
-
-            mais_vendidos = sorted(contagem_vendas.items(), key=lambda item: item[1], reverse=True)
-
-            for produto, qtd in mais_vendidos:
-                print(f" {produto.title()}: {qtd} unidades vendidas")
+        else:
+            for produto, qtd in ranking:
+                print(f" {produto}: {qtd} unidades vendidas")
+    except mysql.connector.Error as e:
+        print(f"Erro ao gerar ranking: {e}")
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()
 
 def continuar_sistema():
-     while True:
+    while True:
         print("-"*10)
-        print("[1] FECHAR SISTEMA")
-        print("[2] Continuar")
+        print("[1] Continuar no Menu")
+        print("[2] Voltar")
         print("-"*10)
         try:
             acao_pos_comando = force_int("Escolha uma ação: ")
-            if acao_pos_comando == 1:
-                print(f"Encerrando sistema o valor total em caixa é de R${caixa:.2f}")
-                exit()
-            return
+            if acao_pos_comando == 1 or acao_pos_comando == 2:
+                return
+            else:
+                print("Opção inválida!")
         except ValueError:
             return exibir_menu_e_estoque
 

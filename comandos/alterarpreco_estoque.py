@@ -1,6 +1,6 @@
 import mysql.connector
 from othrs.connectsql import obter_conexao
-from othrs.force import force_str,force_float,force_int
+from othrs.force import force_str,force_float,force_int,bsc_id
 def alteracoes():
     while True:
         try:
@@ -9,7 +9,7 @@ def alteracoes():
             if alteracao == "preço" or alteracao == "preco":
                 print("\n----- ALTERAR PREÇO --------")
                 try:
-                    id_venda = force_int("Digite o [ID] do produto: ")
+                    id_venda = bsc_id()
                     
                     conexao = obter_conexao()
                     cursor = conexao.cursor()
@@ -61,7 +61,7 @@ def alteracoes():
                 print("\n----- REPOR ESTOQUE --------")
                 
                 try:
-                    id_venda = force_int("Digite o [ID] do produto: ")
+                    id_venda = bsc_id()
                     
                     conexao = obter_conexao()
                     cursor = conexao.cursor()
