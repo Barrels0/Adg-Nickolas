@@ -3,7 +3,7 @@ from othrs.connectsql import obter_conexao
 
 from comandos.banco_dados import inicializar_banco
 from comandos.interface import exibir_menu_e_estoque, catalogo_ordenado
-from comandos.novoitem import adicionar_item, adicionar_fornecedor,criar_usuario,logar_conta,desativar_bebida,corrigir_nome
+from comandos.novoitem import adicionar_item, adicionar_fornecedor,criar_usuario,logar_conta,desativar_bebida,corrigir_nome,add_cupom
 from comandos.alterarpreco_estoque import alteracoes
 from comandos.pesquisa_nome import busca
 from comandos.promocoes import promocoes
@@ -143,5 +143,9 @@ while True:
         continuar_sistema()
     elif comando == 16:
         exportar_relatorio_txt()
+        continuar_sistema()
+    elif comando == 17:
+        if vrf_user(user_ativ):
+            add_cupom()
         continuar_sistema()
 
