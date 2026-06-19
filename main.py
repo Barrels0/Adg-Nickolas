@@ -4,7 +4,7 @@ from othrs.connectsql import obter_conexao
 from comandos.banco_dados import inicializar_banco
 from comandos.interface import exibir_menu_e_estoque, continuar_sistema
 from comandos.caixa import registar_venda, nota_fiscal, exportar_relatorio_txt
-from comandos.estoque import adicionar_item, desativar_bebida,corrigir_nome, reativar_bebida, alteracoes
+from comandos.estoque import adicionar_item, desativar_bebida,corrigir_nome, reativar_bebida, alteracoes, sugestoes
 from comandos.marketing import add_cupom, adicionar_fornecedor, promocoes, ranking_cupons
 from comandos.autenticacao import logar_conta, criar_usuario
 from comandos.relatorios import busca, painel_produtomaisvendido, ranking_vendas, catalogo_ordenado,relatorios_expresso, filtros
@@ -84,74 +84,81 @@ while True:
         print(f"Obrigado por visitar nossa loja o caixa total ficou em R${caixa:.2f}")
         exit()
 
+    # --- VENDAS E CAIXA ---
     elif comando == 1:
         registar_venda()
-
+        continuar_sistema()
     elif comando == 2:
+        nota_fiscal()
+        continuar_sistema()
+    elif comando == 3:
+        exportar_relatorio_txt()
+        continuar_sistema()
+
+    # --- PRODUTOS E ESTOQUE ---
+    elif comando == 4:
         if vrf_user(user_ativ):
             adicionar_item()
         continuar_sistema()
-    elif comando == 3:
-        if vrf_user(user_ativ):
-            alteracoes()
-        continuar_sistema()
-    elif comando == 4:
-        if vrf_user(user_ativ):
-            alteracoes()
-        continuar_sistema()
     elif comando == 5:
-        busca()
+        if vrf_user(user_ativ):
+            alteracoes() # Repor Estoque
         continuar_sistema()
     elif comando == 6:
         if vrf_user(user_ativ):
-            promocoes()
+            alteracoes() # Alterar Preço
         continuar_sistema()
-
     elif comando == 7:
-        nota_fiscal()
-        continuar_sistema()
-
-    elif comando == 8:
-        painel_produtomaisvendido()
-        continuar_sistema()
-    elif comando == 9:
-        ranking_vendas()
-        continuar_sistema()
-
-    elif comando == 10:
-        if vrf_user(user_ativ):
-            adicionar_fornecedor()
-        continuar_sistema()
-    elif comando == 11:
-        relatorios_expresso()
-        continuar_sistema()
-    elif comando == 12:
-        catalogo_ordenado()
-        continuar_sistema()
-    elif comando == 13:
-        filtros()
-        continuar_sistema()
-    elif comando == 14:
         if vrf_user(user_ativ):
             corrigir_nome()
         continuar_sistema()
-    elif comando == 15:
+    elif comando == 8:
         if vrf_user(user_ativ):
             desativar_bebida()
         continuar_sistema()
-    elif comando == 16:
-        exportar_relatorio_txt()
+    elif comando == 9:
+        if vrf_user(user_ativ):
+            reativar_bebida()
         continuar_sistema()
+    elif comando == 10:
+        sugestoes()
+        continuar_sistema()
+
+    # --- CONSULTAS E RELATÓRIOS ---
+    elif comando == 11:
+        busca()
+        continuar_sistema()
+    elif comando == 12:
+        relatorios_expresso()
+        continuar_sistema()
+    elif comando == 13:
+        ranking_vendas() # Historico
+        continuar_sistema()
+    elif comando == 14:
+        catalogo_ordenado()
+        continuar_sistema()
+    elif comando == 15:
+        filtros()
+        continuar_sistema()
+    elif comando == 16:
+        painel_produtomaisvendido() # Estatísticas e Balanço
+        continuar_sistema()
+
+    # --- MARKETING E FORNECEDORES ---
     elif comando == 17:
         if vrf_user(user_ativ):
-            add_cupom()
+            promocoes()
         continuar_sistema()
     elif comando == 18:
         if vrf_user(user_ativ):
-            ranking_cupons()
+            adicionar_fornecedor()
         continuar_sistema()
     elif comando == 19:
         if vrf_user(user_ativ):
-            reativar_bebida()
-        continuar_sistema() 
+            add_cupom()
+        continuar_sistema()
+    elif comando == 20:
+        if vrf_user(user_ativ):
+            ranking_cupons()
+        continuar_sistema()
 

@@ -117,8 +117,6 @@ def adicionar_item() -> None:
                 cursor.close()
                 conexao.close()
 
-        # --- BLOCO DE SALVAMENTO ---
-        # 🔥 VALIDAÇÕES INVIOLÁVEIS: Garante que os dados nunca cheguem vazios ou nulos ao MySQL
         if vintage is None or vintage == 0:
             vintage = 0
 
@@ -414,5 +412,37 @@ def corrigir_nome():
             conexao.close()
 
 
-if __name__ == "__main__":
-    adicionar_fornecedor()
+
+def sugestoes():
+    print("=====SUGESTÕES=====")
+    sugest = force_int("1 -> Carnes\n2 -> Peixes\n3 -> Massas")
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
+        if sugest == 1:
+            print("Buscando os melhores vinhos para carnes!")
+            cursor.execute("SELECT nome,tipo,winery,safra,preco,quantidade,fornecedor,nota FROM estoque WHERE id IN (3,4,5) AND ativo = 1")
+            result = cursor.fetchall()
+            for i in result:
+                    nome, tipo, winery, safra, preco, qtd, fornecedor, nota = i
+                    print(f"-> {nome} ({safra}) - R${preco:.2f} | Nota Vivino: {nota} | Estoque: {qtd}")
+        elif sugest == 2:
+            print("Buscando os melhores vinhos para peixes!")
+            cursor.execute("SELECT nome,tipo,winery,safra,preco,quantidade,fornecedor,nota FROM estoque WHERE id IN (6,7,8) AND ativo = 1")
+            result = cursor.fetchall()
+            for i in result:
+                    nome, tipo, winery, safra, preco, qtd, fornecedor, nota = i
+                    print(f"-> {nome} ({safra}) - R${preco:.2f} | Nota Vivino: {nota} | Estoque: {qtd}")
+        elif sugest == 3:
+            print("Buscando os melhores vinhos para peixes!")
+            cursor.execute("SELECT nome,tipo,winery,safra,preco,quantidade,fornecedor,nota FROM estoque WHERE id IN (9,10,11) AND ativo = 1")
+            result = cursor.fetchall()
+            for i in result:
+                    nome, tipo, winery, safra, preco, qtd, fornecedor, nota = i
+                    print(f"-> {nome} ({safra}) - R${preco:.2f} | Nota Vivino: {nota} | Estoque: {qtd}")
+    except mysql.connector.Error as e:
+        print(f"Erro o banco de dados: {e}")
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()

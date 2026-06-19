@@ -29,36 +29,37 @@ def exibir_menu_e_estoque(caixa_atual):
         )"""
 
     print("""
-        =================================================================
+        ===================================================================
                             ══ MENU DE COMANDOS ══
-        =================================================================
+        ===================================================================
 
-        ┌── VENDAS E CAIXA ──────────────────────────────────────────┐
-        │ [1] Registrar Venda            [7] Nota Fiscal (Sessão)    │
-        │ [16] Exportar Notinha                                      │
-        └────────────────────────────────────────────────────────────┘
+        ┌── VENDAS E CAIXA ──────────────────────────────────────────────┐
+        │ [1] Registrar Venda               [2] Nota Fiscal (Sessão)     │
+        │ [3] Exportar Notinha                                           │
+        └────────────────────────────────────────────────────────────────┘
 
-        ┌── PRODUTOS E ESTOQUE ──────────────────────────────────────┐
-        │ [2] Cadastrar Nova Bebida      [4] Repor Estoque           │
-        │ [3] Alterar Preço              [14] Alterar Nome           │
-        │ [15] Desativar Bebida          [19] Reativar Bebida        │
-        └────────────────────────────────────────────────────────────┘
+        ┌── PRODUTOS E ESTOQUE ──────────────────────────────────────────┐
+        │ [4] Cadastrar Nova Bebida         [5] Repor Estoque            │
+        │ [6] Alterar Preço                 [7] Alterar Nome             │
+        │ [8] Desativar Bebida              [9] Reativar Bebida          │
+        │ [10] Sugestões (Harmonização)                                  │
+        └────────────────────────────────────────────────────────────────┘
 
-        ┌── CONSULTAS E RELATÓRIOS ──────────────────────────────────┐
-        │ [5] Buscar por Nome            [11] Relatórios Expresso    │
-        │ [9] Histórico de Vendas        [12] Catálogo Ordenado      │
-        │ [13] Filtro por Preço          [8] Estatísticas e Balanço  │
-        └────────────────────────────────────────────────────────────┘
+        ┌── CONSULTAS E RELATÓRIOS ──────────────────────────────────────┐
+        │ [11] Buscar por Nome              [12] Relatórios Expresso     │
+        │ [13] Histórico de Vendas          [14] Catálogo Ordenado       │
+        │ [15] Filtro por Preço             [16] Estatísticas e Balanço  │
+        └────────────────────────────────────────────────────────────────┘
 
-        ┌── MARKETING E FORNECEDORES ────────────────────────────────┐
-        │ [6] Promoções                  [10] Novo Fornecedor        │
-        │ [17] Adicionar Cupom           [18] Cupons Mais Utilizados │
-        └────────────────────────────────────────────────────────────┘
+        ┌── MARKETING E FORNECEDORES ────────────────────────────────────┐
+        │ [17] Promoções                    [18] Novo Fornecedor         │
+        │ [19] Adicionar Cupom              [20] Cupons Mais Utilizados  │
+        └────────────────────────────────────────────────────────────────┘
 
-        ┌────────────────────────────────────────────────────────────┐
-        │ [0] Sair do Sistema                                        │
-        └────────────────────────────────────────────────────────────┘
-        =================================================================
+        ┌────────────────────────────────────────────────────────────────┐
+        │ [0] Sair do Sistema                                            │
+        └────────────────────────────────────────────────────────────────┘
+        ===================================================================
         """)
 def continuar_sistema():
     while True:
