@@ -171,7 +171,7 @@ def add_cupom():
     try:
         cursor.execute("""
         INSERT INTO cupons(nome,desconto,quantidade)
-        VALUES (%s,%s,%s),
+        VALUES (%s,%s,%s)
         """,(nome,desconto,qtd,))
         conexao.commit()
     except mysql.connector.Error as e:

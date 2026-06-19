@@ -91,7 +91,7 @@ def realizar_venda():
         total_compra = sum(item["subtotal"] for item in carrinho)
         print(f"\n =============FECHAMENTO CAIXA==============")
         print(f"Total a pagar: R${total_compra:.2f}")
-        confirmar = force_str("Confirmar paramento e registrar venda? (s/n): ").lower()
+        confirmar = force_str("Confirmar pagamento e registrar venda? (s/n): ").lower()
 
         if confirmar == "s":
             pass
@@ -107,6 +107,21 @@ def realizar_venda():
             else:
                 print("ERRO:")
                 return
+            cupom = force_str("Você possui algum cupom de desconto? (S/N): ").upper()
+            if cupom == "S" or cupom == "SIM":
+                nm_cup = force_str("Digite o nome do seu cupom: ").upper()
+                conexao = obter_conexao()
+                cursor = conexao.cursor()
+                cursor.execute("SELECT nome,desconto,quantidade FROM cupons WHERE nome = %s",(nm_cup,))
+                result = cursor.fetchone()
+                if not result or result[2] == 0:
+                    print("Cupom inválido ou esgotado!")
+                else:
+                    total_compra *= (1 - result[1] / 100)
+                    print("Cupom aplicado com sucesso!")
+                    cursor.execute("UPDATE cupons SET quantidade = quantidade -1 WHERE nome = %s",(result[0],))
+            else:
+                pass
             conexao = obter_conexao()
             cursor = conexao.cursor()
             try:
