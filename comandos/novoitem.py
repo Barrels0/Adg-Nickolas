@@ -161,6 +161,28 @@ def adicionar_fornecedor():
         print(f"O fornecedor '{novo_fornecedor}' foi adicionado com sucesso!")
         break"""
 
+def add_cupom():
+    print("-----ADICIONAR CUPOM-----")
+    nome = force_str("Digite o nome do cupom: ").upper()
+    desconto = force_int("Digite a porcentagem do desconto: ")
+    qtd = force_int("Digite a quantidade de cupons: ")
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("""
+        INSERT INTO cupons(nome,desconto,quantidade)
+        VALUES (%s,%s,%s),
+        """,(nome,desconto,qtd,))
+        conexao.commit()
+    except mysql.connector.Error as e:
+            conexao.rollback()
+            print(f"Ocorreu um erro: {e}")
+            return
+    finally:
+        if 'conexao' in locals() and conexao.is_connected():
+            cursor.close()
+            conexao.close()
+    
 
 def criar_usuario():
     print("\n------- CRIAR CONTA ----- ")
