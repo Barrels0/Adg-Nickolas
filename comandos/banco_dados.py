@@ -24,7 +24,8 @@ def inicializar_banco():
                 quantidade INTEGER NOT NULL,
                 preco FLOAT NOT NULL,
                 nota INTEGER NOT NULL,
-                ativo INTEGER DEFAULT 1
+                ativo INTEGER DEFAULT 1,
+                qtd_vend INTEGER DEFAULT 0
             )
                 """)
             
@@ -40,6 +41,7 @@ def inicializar_banco():
                 preco FLOAT NOT NULL,
                 valor FLOAT NOT NULL,
                 pagamento VARCHAR(100) NOT NULL,
+                cupom VARCHAR(100) NOT NULL,
                 FOREIGN KEY (id_bebida) REFERENCES estoque (id)
             )
                 """)
@@ -71,6 +73,7 @@ def inicializar_banco():
                 quantidade INT NOT NULL
             )
                 """)
+            
 
             # Faz uma contagem de quantas linhas existem na tabela estoque
             cursor.execute("SELECT COUNT(*) FROM estoque")

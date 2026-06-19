@@ -2,15 +2,13 @@ import mysql.connector
 from othrs.connectsql import obter_conexao
 
 from comandos.banco_dados import inicializar_banco
-from comandos.interface import exibir_menu_e_estoque, catalogo_ordenado
-from comandos.novoitem import adicionar_item, adicionar_fornecedor,criar_usuario,logar_conta,desativar_bebida,corrigir_nome,add_cupom
-from comandos.alterarpreco_estoque import alteracoes
-from comandos.pesquisa_nome import busca
-from comandos.promocoes import promocoes
-from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros, exportar_relatorio_txt
-
-from othrs.force import force_int,vrf_user
-from comandos.registrar_venda import realizar_venda
+from comandos.interface import exibir_menu_e_estoque, continuar_sistema
+from comandos.caixa import registar_venda, nota_fiscal, exportar_relatorio_txt
+from comandos.estoque import adicionar_item, desativar_bebida,corrigir_nome, reativar_bebida, alteracoes
+from comandos.marketing import add_cupom, adicionar_fornecedor, promocoes, ranking_cupons
+from comandos.autenticacao import logar_conta, criar_usuario
+from comandos.relatorios import busca, painel_produtomaisvendido, ranking_vendas, catalogo_ordenado,relatorios_expresso, filtros
+from othrs.force import force_int, vrf_user
 
 inicializar_banco()
 
@@ -87,7 +85,7 @@ while True:
         exit()
 
     elif comando == 1:
-        realizar_venda()
+        registar_venda()
 
     elif comando == 2:
         if vrf_user(user_ativ):
@@ -148,4 +146,12 @@ while True:
         if vrf_user(user_ativ):
             add_cupom()
         continuar_sistema()
+    elif comando == 18:
+        if vrf_user(user_ativ):
+            ranking_cupons()
+        continuar_sistema()
+    elif comando == 19:
+        if vrf_user(user_ativ):
+            reativar_bebida()
+        continuar_sistema() 
 
