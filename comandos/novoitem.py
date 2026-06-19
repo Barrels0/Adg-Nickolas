@@ -226,7 +226,7 @@ def logar_conta():
             
             if dados is not None:
                 print("Login realizado com sucesso!")
-                break
+                return usuario
             else:
                 print("Usuário ou senha incorretos!")
                 try:

@@ -9,7 +9,7 @@ from comandos.pesquisa_nome import busca
 from comandos.promocoes import promocoes
 from comandos.resultado_relatorio import ranking_vendas,nota_fiscal,painel_produtomaisvendido,continuar_sistema,relatorios_expresso,filtros, exportar_relatorio_txt
 
-from othrs.force import force_int
+from othrs.force import force_int,vrf_user
 from comandos.registrar_venda import realizar_venda
 
 inicializar_banco()
@@ -42,12 +42,11 @@ escolha = force_int("Selecione um dos dois itens mostrados acima: ")
 
 if escolha == 1:
     criar_usuario()
-    logar_conta()
+    user_ativ = logar_conta()
 elif escolha == 2:
-    logar_conta()
+    user_ativ = logar_conta()
 else:
     print("Escolha uma opção valida!")
-
 while True:
     conexao = obter_conexao()
     cursor = conexao.cursor()
@@ -91,19 +90,23 @@ while True:
         realizar_venda()
 
     elif comando == 2:
-        adicionar_item()
+        if vrf_user(user_ativ):
+            adicionar_item()
         continuar_sistema()
     elif comando == 3:
-        alteracoes()
+        if vrf_user(user_ativ):
+            alteracoes()
         continuar_sistema()
     elif comando == 4:
-        alteracoes()
+        if vrf_user(user_ativ):
+            alteracoes()
         continuar_sistema()
     elif comando == 5:
         busca()
         continuar_sistema()
     elif comando == 6:
-        promocoes()
+        if vrf_user(user_ativ):
+            promocoes()
         continuar_sistema()
 
     elif comando == 7:
@@ -118,7 +121,8 @@ while True:
         continuar_sistema()
 
     elif comando == 10:
-        adicionar_fornecedor()
+        if vrf_user(user_ativ):
+            adicionar_fornecedor()
         continuar_sistema()
     elif comando == 11:
         relatorios_expresso()
@@ -130,10 +134,12 @@ while True:
         filtros()
         continuar_sistema()
     elif comando == 14:
-        corrigir_nome()
+        if vrf_user(user_ativ):
+            corrigir_nome()
         continuar_sistema()
     elif comando == 15:
-        desativar_bebida()
+        if vrf_user(user_ativ):
+            desativar_bebida()
         continuar_sistema()
     elif comando == 16:
         exportar_relatorio_txt()

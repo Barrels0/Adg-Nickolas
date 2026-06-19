@@ -52,3 +52,12 @@ def bsc_id(mensagem="Digite o [ID] do produto: ") -> int:
         finally:
             cursor.close()
             conexao.close()
+
+
+def vrf_user(usuario_ativo):
+    if usuario_ativo == 'Chefe': 
+        print("Autorização concedida!")
+        return True
+    else:
+        print("Você é um cliente e não pode acessar essa funcionalidade!")
+        return False
