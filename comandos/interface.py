@@ -6,7 +6,7 @@ def exibir_menu_e_estoque(caixa_atual):
     """
     print(f"""
     ========================================================
-                         ADEGA MARIO
+                         ADEGA NICKOLAS
                 Caixa Acumulado: R${caixa_atual:.2f}
     ========================================================
     """)
@@ -27,7 +27,7 @@ def exibir_menu_e_estoque(caixa_atual):
         print(
             f"[{id_adega}] {adega['nome']} ({adega['safra']}) | Tipo: {adega['tipo']} | Autor: {adega} | R$ {adega['preco']:.2f} | Estoque: {adega['quantidade']}"
         )"""
-
+#1,2,3,11,14,15,20,4,5,18,10,7
     print("""
         ===================================================================
                             ══ MENU DE COMANDOS ══
@@ -42,7 +42,7 @@ def exibir_menu_e_estoque(caixa_atual):
         │ [4] Cadastrar Nova Bebida         [5] Repor Estoque            │
         │ [6] Alterar Preço                 [7] Alterar Nome             │
         │ [8] Desativar Bebida              [9] Reativar Bebida          │
-        │ [10] Sugestões (Harmonização)                                  │
+        │ [10] Adicionar cliente                                         │
         └────────────────────────────────────────────────────────────────┘
 
         ┌── CONSULTAS E RELATÓRIOS ──────────────────────────────────────┐
